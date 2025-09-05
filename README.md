@@ -1,6 +1,6 @@
 # 📚 Smart Digital Library
 
-Smart Digital Library é uma plataforma web baseada em Django que moderniza a gestão de livros para instituições e leitores. Oferece um design responsivo e multiplataforma, um catálogo interativo com filtros, coleções temáticas e selecionadas por professores, recomendações personalizadas com inteligência artificial e um painel administrativo para gerentes e bibliotecários."
+Smart Digital Library é uma plataforma web em Django que moderniza a gestão de livros por instituições e leitores com catálogo interativo, listas e coleções temáticas, recomendações por inteligência artificial e painel administrativo.
 
 ---
 
