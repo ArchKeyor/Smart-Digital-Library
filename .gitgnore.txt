@@ -1,0 +1,27 @@
+# Byte-compiled / Python files
+__pycache__/
+*.py[cod]
+
+# Environment
+env/
+my_env/
+*.venv
+
+# Database
+db.sqlite3
+
+# VSCode
+.vscode/
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.swp
+*.swo
+
+# Media / uploads
+media/
