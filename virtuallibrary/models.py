@@ -22,7 +22,7 @@ class Book(models.Model):
     status = models.CharField(
         max_length=2,
         choices = Status,
-        default=Status.DRAFT
+        default=Status.DRAFT    
     )
     class Meta:
         ordering = ['-publish']
