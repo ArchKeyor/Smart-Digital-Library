@@ -1,16 +1,36 @@
 {% extends "virtuallibrary/base.html" %}
+
 {% block title %}My virtuallibrary{% endblock %}
+
 {% block content %}
  <h1>My virtuallibrary</h1>
- {% for book in books %}
- <h2>
-<a href="{% url 'virtuallibrary:book_detail' book.id %}">
- {{ book.title }}
- </a>
-</h2>
+
+{% if tag %}
+<h2>Books tagged with "{{ tag.name }}"</h2>
+{% endif %}
+
+{% for book in books %}
+    <h2>
+        <a href="{% url 'virtuallibrary:book_detail' book.id %}">
+            {{ book.title }}
+        </a>
+    </h2>
+
+<p class="tags">
+    Tags: 
+    {% for tag in book.tags.all %}
+        <a href="{% url 'virtuallibrary:book_list_by_tag' tag.slug %}">
+            {{ tag.name }}
+        </a>{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+
 <p class="date">
- Published {{ book.publish }} by {{ book.author }}
+    Published {{ book.publish }} by {{ book.author }}
  </p>
- {{ book.body|truncatewords:30|linebreaks }}
- {% endfor %}
+
+    {{ book.body|truncatewords:30|linebreaks }}
+{% endfor %}
+
+{% include "pagination.html" with page=books %}
 {% endblock %}
