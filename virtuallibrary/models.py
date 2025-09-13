@@ -3,6 +3,9 @@ from django.db import models
 from django.utils import timezone
 
 # Create your models here.
+class PublishedManager(models.Manager):
+ def get_queryset(self):
+     return (super().get_queryset().filter(status=Book.Status.PUBLISHED))
 class Book(models.Model):
     class Status(models.TextChoices):
         DRAFT = 'DF','Draft'
@@ -24,10 +27,12 @@ class Book(models.Model):
         choices = Status,
         default=Status.DRAFT    
     )
-    class Meta:
+    objects = models.Manager()
+    published = PublishedManager()
+class Meta:
         ordering = ['-publish']
         indexes = [
             models.Index(fields=['-publish']),
         ]
-    def __str__(self):
-        return self.title
+        def __str__(self):
+            return self.title

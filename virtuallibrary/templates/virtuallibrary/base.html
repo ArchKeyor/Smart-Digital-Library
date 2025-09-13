@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}My Virtual Library{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'virtuallibrary/css/virtuallibrary.css' %}">
+</head>
+<body>
+    <div id="wrapper">
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+        
+        <div id="sidebar">
+            <h2>My Virtual Library</h2>
+            <p>Welcome to my Virtual Library. Explore the books!</p>
+        </div>
+    </div>
+</body>
+</html>

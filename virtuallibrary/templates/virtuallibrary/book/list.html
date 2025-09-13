@@ -1,0 +1,16 @@
+{% extends "virtuallibrary/base.html" %}
+{% block title %}My virtuallibrary{% endblock %}
+{% block content %}
+ <h1>My virtuallibrary</h1>
+ {% for book in books %}
+ <h2>
+<a href="{% url 'virtuallibrary:book_detail' book.id %}">
+ {{ book.title }}
+ </a>
+</h2>
+<p class="date">
+ Published {{ book.publish }} by {{ book.author }}
+ </p>
+ {{ book.body|truncatewords:30|linebreaks }}
+ {% endfor %}
+{% endblock %}
