@@ -63,3 +63,6 @@ def book_detail(request, id):
             'similar_books': similar_books
         }
     )
+
+def login_view(request):
+    return render(request, 'login/login.html')

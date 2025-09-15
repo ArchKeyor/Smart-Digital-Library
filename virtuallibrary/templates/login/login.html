@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Virtual Library</title>
+</head>
+<body>
+    <div class="main-container">
+        <div class="left-section">
+            <div class="logo-icon"></div>
+            
+            <header>
+                <h1>Olá,<br>Bem-vindo(a)!</h1>
+                <p>Sua próxima descoberta está a um clique de distância</p>
+            </header>
+
+            <div class="form-conteiner">
+                <form class="form-content">
+                    <input type="email" placeholder="Digite seu email" required>
+                    <input type="password" placeholder="Digite sua senha" required>
+                </form>
+                
+                <div class="form-options">
+                    <label class="label-checkbox">
+                        <input type="checkbox" name="lembre" value="sim">
+                        Lembre-se de mim
+                    </label>
+                    <a href="#" class="senha-rec">Esqueceu a senha ?</a>
+                </div>
+                
+                <button class="entrar-btn" type="submit">Entrar</button>
+                
+                <a href="#" class="cadastro-link">Não tem uma conta? Cadastre-se</a>
+            </div>
+        </div>
+        
+        <div class="right-section"></div>
+    </div>
+</body>
+</html>
