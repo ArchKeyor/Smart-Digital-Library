@@ -1,19 +1,33 @@
 from taggit.models import Tag
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, render
-from django.core.paginator import EmptyPage,PageNotAnInteger, Paginator
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Count, Q
 from .models import Book
-from django.db.models import Count
+from .forms import SearchForm
 
-def book_list(request,tag_slug=None):
+def book_list(request, tag_slug=None):
     book_list = Book.published.all()
     tag = None
+    search_form = SearchForm()
+    query = None
 
     if tag_slug:
-        tag = get_object_or_404(Tag,slug=tag_slug)
-        book_list = book_list.filter(tags_in=[tag])
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        book_list = book_list.filter(tags__in=[tag])
 
-    paginator = Paginator(book_list,3)
+    # Busca por texto
+    if 'query' in request.GET:
+        search_form = SearchForm(request.GET)
+        if search_form.is_valid():
+            query = search_form.cleaned_data['query']
+            book_list = book_list.filter(
+                Q(title__icontains=query) | 
+                Q(body__icontains=query) |
+                Q(author__username__icontains=query)
+            ).distinct()
+
+    paginator = Paginator(book_list, 3)
     page_number = request.GET.get('page', 1)
 
     try:
@@ -26,9 +40,14 @@ def book_list(request,tag_slug=None):
     return render(
         request,
         'virtuallibrary/book/list.html',
-        {'books': books,
-         'tag': tag}
+        {
+            'books': books,
+            'tag': tag,
+            'search_form': search_form,
+            'query': query
+        }
     )
+
 def book_detail(request, id):
     book = get_object_or_404(Book, id=id, status=Book.Status.PUBLISHED)
 

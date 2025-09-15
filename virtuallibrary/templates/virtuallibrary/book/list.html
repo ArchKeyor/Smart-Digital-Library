@@ -9,6 +9,11 @@
 <h2>Books tagged with "{{ tag.name }}"</h2>
 {% endif %}
 
+ <form method="get" action="{% url 'virtuallibrary:book_list' %}">
+     {{ search_form.query }}
+     <button type="submit">Buscar</button>
+ </form>
+
 {% for book in books %}
     <h2>
         <a href="{% url 'virtuallibrary:book_detail' book.id %}">
