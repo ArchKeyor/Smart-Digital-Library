@@ -6,6 +6,14 @@
  Published {{ book.publish }} by {{ book.author }}
  </p>
  {{ book.body|linebreaks }}
+ <h2>Similar books</h2>
+ {% for book in similar_books %}
+<p>
+<a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+</p>
+{% empty %}
+    There are no similar books yet.
+{% endfor %}
 {% endblock %}
 
 
