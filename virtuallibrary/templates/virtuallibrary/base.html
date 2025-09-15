@@ -15,6 +15,16 @@
         <div id="sidebar">
             <h2>My Virtual Library</h2>
             <p>Welcome to my Virtual Library. Explore the books!</p>
+            
+            <!-- Sistema de autenticação -->
+            <div class="auth-section">
+                {% if user.is_authenticated %}
+                    <p>Olá, {{ user.username }}!</p>
+                    <p><a href="{% url 'virtuallibrary:logout' %}">Sair</a></p>
+                {% else %}
+                    <p><a href="{% url 'virtuallibrary:login' %}">Entrar/Cadastrar</a></p>
+                {% endif %}
+            </div>
         </div>
     </div>
 </body>

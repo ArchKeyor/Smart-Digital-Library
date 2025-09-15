@@ -16,3 +16,7 @@ class SearchForm(forms.Form):
             'placeholder': 'Buscar livros...',
         })
     )
+
+class SimpleAuthForm(forms.Form):
+    username = forms.CharField(max_length=150)
+    password = forms.CharField(widget=forms.PasswordInput)
