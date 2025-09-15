@@ -63,35 +63,5 @@ def book_detail(request, id):
         }
     )
 
-def simple_auth(request):
-    message = ""
-    
-    if request.method == 'POST':
-        form = SimpleAuthForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            
-            # Tenta fazer login primeiro
-            user = authenticate(username=username, password=password)
-            if user:
-                login(request, user)
-                return redirect('virtuallibrary:book_list')
-            else:
-                # Se não conseguir login, cria usuário novo
-                if User.objects.filter(username=username).exists():
-                    message = "Usuário existe mas senha está errada"
-                else:
-                    # Criar usuário novo
-                    user = User.objects.create_user(username=username, password=password)
-                    login(request, user)
-                    return redirect('virtuallibrary:book_list')
-    else:
-        form = SimpleAuthForm()
-    
-    return render(request, 'virtuallibrary/login.html', {'form': form, 'message': message})
-
-def logout_view(request):
-    from django.contrib.auth import logout
-    logout(request)
-    return redirect('virtuallibrary:book_list')
+def login_view(request):
+    return render(request, 'login/login.html')
