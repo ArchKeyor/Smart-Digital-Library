@@ -14,7 +14,6 @@ def book_list(request, tag_slug=None):
     query = None
     all_tags = Tag.objects.filter(taggit_taggeditem_items__content_type__model='book').distinct()
 
-
     if tag_slug:
         tag = get_object_or_404(Tag, slug=tag_slug)
         book_list = book_list.filter(tags__in=[tag])
@@ -26,7 +25,7 @@ def book_list(request, tag_slug=None):
             book_list = book_list.filter(
                 Q(title__icontains=query) | 
                 Q(body__icontains=query) |
-                Q(author__username__icontains=query)
+                Q(author__icontains=query)  # CORRIGIDO: agora busca pelo nome do autor real
             ).distinct()
 
     paginator = Paginator(book_list, 3)
@@ -82,6 +81,7 @@ def login_view(request):
 
 def home_view(request):
     return render(request, 'home/home.html', {'user': request.user})
+
 def logout_view(request):
     logout(request)
     return redirect('/')

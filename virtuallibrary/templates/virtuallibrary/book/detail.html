@@ -1,183 +1,87 @@
 {% extends "virtuallibrary/base.html" %}
 {% load static %}
 
-{% block title %}{{ book.title }}{% endblock %}
+{% block title %}My virtuallibrary{% endblock %}
 
 {% block content %}
-<div class="book-detail-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+<h1>My virtuallibrary</h1>
+
+<!-- FILTROS POR CATEGORIA/TAG - ADICIONAR ESTA SEÇÃO -->
+<div class="category-filters" style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+    <h3>Filtrar por Categoria:</h3>
     
-    <!-- Cabeçalho do livro -->
-    <div class="book-header" style="display: flex; gap: 30px; margin-bottom: 40px; flex-wrap: wrap;">
-        
-        <!-- Capa do livro -->
-        <div class="book-cover" style="flex: 0 0 300px;">
-            {% if book.cover %}
-                <img src="{{ book.cover.url }}" 
-                     alt="{{ book.title }} cover" 
-                     style="width: 100%; max-width: 300px; height: 450px; object-fit: cover; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
-            {% else %}
-                <img src="{% static 'images/default_cover.png' %}" 
-                     alt="Capa padrão" 
-                     style="width: 100%; max-width: 300px; height: 450px; object-fit: cover; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
-            {% endif %}
-        </div>
-
-        <!-- Informações do livro -->
-        <div class="book-info" style="flex: 1; min-width: 300px;">
-            <h1 style="font-size: 2.5rem; color: #333; margin-bottom: 20px; line-height: 1.2;">
-                {{ book.title }}
-            </h1>
-            
-            <div class="book-metadata" style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-                <p style="margin: 10px 0; font-size: 1.1rem;">
-                    <strong>📝 Autor:</strong> {{ book.author.username }}
-                </p>
-                <p style="margin: 10px 0; font-size: 1.1rem;">
-                    <strong>📅 Publicado:</strong> {{ book.publish|date:"d/m/Y às H:i" }}
-                </p>
-                <p style="margin: 10px 0; font-size: 1.1rem;">
-                    <strong>🆕 Criado:</strong> {{ book.created|date:"d/m/Y" }}
-                </p>
-                <p style="margin: 10px 0; font-size: 1.1rem;">
-                    <strong>🔄 Atualizado:</strong> {{ book.updated|date:"d/m/Y" }}
-                </p>
-            </div>
-
-            <!-- Tags do livro -->
-            {% if book.tags.all %}
-            <div class="book-tags" style="margin: 20px 0;">
-                <h3 style="color: #333; margin-bottom: 10px;">🏷️ Categorias:</h3>
-                {% for tag in book.tags.all %}
-                    <a href="{% url 'virtuallibrary:book_list_by_tag' tag.slug %}" 
-                       style="display: inline-block; background-color: #007bff; color: white; padding: 8px 15px; margin: 5px 5px 5px 0; text-decoration: none; border-radius: 20px; font-size: 14px; transition: background-color 0.2s;">
-                        {{ tag.name }}
-                    </a>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Conteúdo do livro -->
-    <div class="book-content" style="background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 40px;">
-        <h2 style="color: #333; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 10px;">
-            📖 Descrição
-        </h2>
-        <div style="font-size: 1.1rem; line-height: 1.6; color: #444;">
-            {{ book.body|linebreaks }}
-        </div>
-    </div>
-
-    <!-- Seção de livros similares -->
-    <div class="similar-books-section" style="margin-top: 50px;">
-        <h2 style="color: #333; border-bottom: 3px solid #007bff; padding-bottom: 15px; margin-bottom: 30px; font-size: 1.8rem;">
-            📚 Livros que você também pode gostar
-        </h2>
-
-        {% if similar_books %}
-            <div class="similar-books-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; margin-top: 30px;">
-                {% for similar_book in similar_books %}
-                    <div class="similar-book-card" style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; text-align: center; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); transition: all 0.3s ease; cursor: pointer;">
-                        
-                        <!-- Capa do livro similar -->
-                        <a href="{{ similar_book.get_absolute_url }}" style="text-decoration: none; display: block;">
-                            {% if similar_book.cover %}
-                                <img src="{{ similar_book.cover.url }}" 
-                                     alt="{{ similar_book.title }} cover" 
-                                     style="width: 140px; height: 210px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s ease;">
-                            {% else %}
-                                <img src="{% static 'images/default_cover.png' %}" 
-                                     alt="Capa padrão" 
-                                     style="width: 140px; height: 210px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s ease;">
-                            {% endif %}
-                        </a>
-                        
-                        <!-- Informações do livro similar -->
-                        <div class="book-card-info">
-                            <h4 style="margin: 12px 0 8px 0; font-size: 1.1rem; font-weight: 600;">
-                                <a href="{{ similar_book.get_absolute_url }}" 
-                                   style="text-decoration: none; color: #333; transition: color 0.2s;">
-                                    {{ similar_book.title|truncatechars:35 }}
-                                </a>
-                            </h4>
-                            
-                            <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">
-                                <strong>Por:</strong> {{ similar_book.author.username }}
-                            </p>
-                            
-                            <p style="font-size: 0.85rem; color: #999; margin: 5px 0;">
-                                {{ similar_book.publish|date:"d/m/Y" }}
-                            </p>
-                            
-                            <!-- Tags do livro similar -->
-                            <div style="margin-top: 12px; min-height: 35px;">
-                                {% for tag in similar_book.tags.all|slice:":3" %}
-                                    <span style="background-color: #e3f2fd; color: #1976d2; padding: 3px 8px; font-size: 11px; border-radius: 12px; margin: 2px; display: inline-block;">
-                                        {{ tag.name }}
-                                    </span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div style="text-align: center; padding: 40px; background-color: #f8f9fa; border-radius: 10px;">
-                <p style="color: #666; font-size: 1.1rem; margin-bottom: 10px;">
-                    🔍 Nenhum livro similar encontrado ainda.
-                </p>
-                <p style="color: #999; font-size: 0.9rem;">
-                    Que tal explorar outros livros da nossa biblioteca?
-                </p>
-                <a href="{% url 'virtuallibrary:book_list' %}" 
-                   style="display: inline-block; margin-top: 15px; background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; transition: background-color 0.2s;">
-                    Ver todos os livros
-                </a>
-            </div>
-        {% endif %}
-    </div>
+    <!-- Botão "Todos" -->
+    <a href="{% url 'virtuallibrary:book_list' %}" 
+       class="filter-btn {% if not tag %}active{% endif %}"
+       style="display: inline-block; margin: 5px; padding: 8px 15px; text-decoration: none; background-color: {% if not tag %}#007bff{% else %}#6c757d{% endif %}; color: white; border-radius: 3px;">
+        Todos
+    </a>
+    
+    <!-- Botões para cada tag -->
+    {% for filter_tag in all_tags %}
+        <a href="{% url 'virtuallibrary:book_list_by_tag' filter_tag.slug %}"
+           class="filter-btn {% if tag.slug == filter_tag.slug %}active{% endif %}"
+           style="display: inline-block; margin: 5px; padding: 8px 15px; text-decoration: none; background-color: {% if tag.slug == filter_tag.slug %}#007bff{% else %}#6c757d{% endif %}; color: white; border-radius: 3px;">
+            {{ filter_tag.name }}
+        </a>
+    {% endfor %}
 </div>
 
-<!-- CSS adicional para interações -->
-<style>
-.similar-book-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    border-color: #007bff;
-}
+<!-- Indicador do filtro ativo -->
+{% if tag %}
+<h2 style="color: #007bff;">📚 Livros da categoria "{{ tag.name }}"</h2>
+{% else %}
+<h2>📚 Todos os livros</h2>
+{% endif %}
 
-.similar-book-card:hover img {
-    transform: scale(1.05);
-}
+<!-- Formulário de busca -->
+<form method="get" action="{% url 'virtuallibrary:book_list' %}" style="margin: 20px 0;">
+    {{ search_form.query }}
+    <button type="submit" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 3px;">Buscar</button>
+</form>
 
-.similar-book-card:hover h4 a {
-    color: #007bff;
-}
+<!-- Lista de livros -->
+{% for book in books %}
+    <div style="margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+        {% if book.cover %}
+            <img src="{{ book.cover.url }}" alt="{{ book.title }} cover" width="150" style="float: left; margin-right: 15px;">
+        {% else %}
+            <img src="{% static 'images/default_cover.png' %}" alt="Capa padrão" width="150" style="float: left; margin-right: 15px;">
+        {% endif %}
 
-.book-tags a:hover {
-    background-color: #0056b3;
-}
+        <h2>
+            <a href="{% url 'virtuallibrary:book_detail' book.id %}" style="text-decoration: none; color: #007bff;">
+                {{ book.title }}
+            </a>
+        </h2>
 
-@media (max-width: 768px) {
-    .book-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .book-cover {
-        flex: none;
-        align-self: center;
-    }
-    
-    .similar-books-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-    }
-    
-    .book-detail-container {
-        padding: 15px;
-    }
-}
-</style>
+        <p class="tags" style="margin: 10px 0;">
+            <strong>Tags:</strong> 
+            {% for book_tag in book.tags.all %}
+                <a href="{% url 'virtuallibrary:book_list_by_tag' book_tag.slug %}"
+                   style="background-color: #e9ecef; padding: 3px 8px; margin: 2px; text-decoration: none; border-radius: 15px; font-size: 12px; color: #495057;">
+                    {{ book_tag.name }}
+                </a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
 
+        <!-- LINHA CORRIGIDA: Agora mostra o autor real e data real de publicação -->
+        <p class="date" style="color: #6c757d; font-size: 14px;">
+            <strong>Autor:</strong> {{ book.author }} | 
+            <strong>Publicado em:</strong> {{ book.publication_date|date:"d/m/Y" }}
+        </p>
+        
+        <!-- Informação opcional: quem adicionou ao sistema -->
+        {% if user.is_staff %}
+            <p style="color: #999; font-size: 12px;">
+                <em>Adicionado ao sistema por {{ book.posted_by.username }} em {{ book.publish|date:"d/m/Y H:i" }}</em>
+            </p>
+        {% endif %}
+
+        {{ book.body|truncatewords:30|linebreaks }}
+        <div style="clear: both;"></div>
+    </div>
+{% endfor %}
+
+{% include "pagination.html" with page=books %}
 {% endblock %}
