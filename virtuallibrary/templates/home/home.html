@@ -49,6 +49,7 @@
                     </h3>
                     <p><strong>Autor:</strong> {{ emprestimo.book.author }}</p>
                     <p><strong>Emprestado em:</strong> {{ emprestimo.data_emprestimo|date:"d/m/Y" }}</p>
+                    <p><strong>Data de devolução:</strong> {{ emprestimo.data_devolucao|date:"d/m/Y" }}</p>
                     <div style="clear: both;"></div>
                 </div>
             {% endfor %}

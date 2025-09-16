@@ -6,6 +6,7 @@ from django.db.models import Count, Q
 from .models import Book, UserProfile, Emprestimo
 from .forms import SearchForm
 from django.conf import settings
+from datetime import timedelta
 
 def book_list(request, tag_slug=None):
     book_list = Book.published.all()
@@ -83,11 +84,16 @@ def home_view(request):
     emprestimos = []
     if request.user.is_authenticated:
         emprestimos = Emprestimo.objects.filter(user=request.user).select_related('book')
+        
+        # Adiciona a data de devolução para cada empréstimo
+        for emprestimo in emprestimos:
+            emprestimo.data_devolucao = emprestimo.data_emprestimo + timedelta(days=14)
     
     return render(request, 'home/home.html', {
         'user': request.user,
         'emprestimos': emprestimos
     })
+
 def logout_view(request):
     logout(request)
     return redirect('/')
