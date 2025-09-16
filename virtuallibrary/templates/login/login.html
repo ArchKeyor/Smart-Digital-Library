@@ -18,9 +18,11 @@
             </header>
 
             <div class="form-conteiner">
-                <form class="form-content">
-                    <input type="email" placeholder="Digite seu email" required>
-                    <input type="password" placeholder="Digite sua senha" required>
+                <form class="form-content" method="post" action="">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Digite seu usuário" required>
+                    <input type="password" name="password" placeholder="Digite sua senha" required>
+                    <button class="entrar-btn" type="submit">Entrar</button>
                 </form>
                 
                 <div class="form-options">
@@ -30,8 +32,6 @@
                     </label>
                     <a href="#" class="senha-rec">Esqueceu a senha ?</a>
                 </div>
-                
-                <button class="entrar-btn" type="submit">Entrar</button>
                 
                 <a href="#" class="cadastro-link">Não tem uma conta? Cadastre-se</a>
             </div>

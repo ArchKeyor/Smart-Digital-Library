@@ -6,6 +6,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
 from .models import Book
 from .forms import SearchForm, SimpleAuthForm
+from django.conf import settings
 
 def book_list(request, tag_slug=None):
     book_list = Book.published.all()
@@ -64,7 +65,18 @@ def book_detail(request, id):
     )
 
 def login_view(request):
-    return render(request, 'login/login.html')
+    message = ''
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect(settings.LOGIN_REDIRECT_URL)  # redireciona para /virtuallibrary/home/
+        else:
+            message = 'Usuário ou senha inválidos'
 
-#def home_view(request):
-#    return render(request, 'home/home.html')  # substitua pelo caminho do seu template
+    return render(request, 'login/login.html', {'message': message})
+
+def home_view(request):
+    return render(request, 'home/home.html', {'user': request.user})

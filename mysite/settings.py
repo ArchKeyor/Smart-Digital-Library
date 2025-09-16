@@ -126,7 +126,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/home/'   # substitua pela página inicial após login
+LOGIN_REDIRECT_URL = '/virtuallibrary/home/'   # substitua pela página inicial após login
 LOGOUT_REDIRECT_URL = '/'       # volta para a tela de login após logout
 
 STATIC_URL = '/static/'
