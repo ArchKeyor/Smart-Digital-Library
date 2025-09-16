@@ -1,87 +1,51 @@
 {% extends "virtuallibrary/base.html" %}
 {% load static %}
 
-{% block title %}My virtuallibrary{% endblock %}
+{% block title %}{{ book.title }}{% endblock %}
 
 {% block content %}
-<h1>My virtuallibrary</h1>
+<h1>{{ book.title }}</h1>
 
-<!-- FILTROS POR CATEGORIA/TAG - ADICIONAR ESTA SEÇÃO -->
-<div class="category-filters" style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
-    <h3>Filtrar por Categoria:</h3>
-    
-    <!-- Botão "Todos" -->
-    <a href="{% url 'virtuallibrary:book_list' %}" 
-       class="filter-btn {% if not tag %}active{% endif %}"
-       style="display: inline-block; margin: 5px; padding: 8px 15px; text-decoration: none; background-color: {% if not tag %}#007bff{% else %}#6c757d{% endif %}; color: white; border-radius: 3px;">
-        Todos
-    </a>
-    
-    <!-- Botões para cada tag -->
-    {% for filter_tag in all_tags %}
-        <a href="{% url 'virtuallibrary:book_list_by_tag' filter_tag.slug %}"
-           class="filter-btn {% if tag.slug == filter_tag.slug %}active{% endif %}"
-           style="display: inline-block; margin: 5px; padding: 8px 15px; text-decoration: none; background-color: {% if tag.slug == filter_tag.slug %}#007bff{% else %}#6c757d{% endif %}; color: white; border-radius: 3px;">
-            {{ filter_tag.name }}
-        </a>
-    {% endfor %}
-</div>
-
-<!-- Indicador do filtro ativo -->
-{% if tag %}
-<h2 style="color: #007bff;">📚 Livros da categoria "{{ tag.name }}"</h2>
+{% if book.cover %}
+    <img src="{{ book.cover.url }}" alt="{{ book.title }} cover" width="300">
 {% else %}
-<h2>📚 Todos os livros</h2>
+    <img src="{% static 'images/default_cover.png' %}" alt="Capa padrão" width="300">
 {% endif %}
 
-<!-- Formulário de busca -->
-<form method="get" action="{% url 'virtuallibrary:book_list' %}" style="margin: 20px 0;">
-    {{ search_form.query }}
-    <button type="submit" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 3px;">Buscar</button>
-</form>
+<p><strong>Autor:</strong> {{ book.author }}</p>
+<p><strong>Publicado em:</strong> {{ book.publication_date|date:"d/m/Y" }}</p>
 
-<!-- Lista de livros -->
-{% for book in books %}
-    <div style="margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-        {% if book.cover %}
-            <img src="{{ book.cover.url }}" alt="{{ book.title }} cover" width="150" style="float: left; margin-right: 15px;">
-        {% else %}
-            <img src="{% static 'images/default_cover.png' %}" alt="Capa padrão" width="150" style="float: left; margin-right: 15px;">
-        {% endif %}
+<p class="tags">
+    <strong>Tags:</strong> 
+    {% for tag in book.tags.all %}
+        <a href="{% url 'virtuallibrary:book_list_by_tag' tag.slug %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
 
-        <h2>
-            <a href="{% url 'virtuallibrary:book_detail' book.id %}" style="text-decoration: none; color: #007bff;">
-                {{ book.title }}
-            </a>
-        </h2>
+<div>{{ book.body|linebreaks }}</div>
 
-        <p class="tags" style="margin: 10px 0;">
-            <strong>Tags:</strong> 
-            {% for book_tag in book.tags.all %}
-                <a href="{% url 'virtuallibrary:book_list_by_tag' book_tag.slug %}"
-                   style="background-color: #e9ecef; padding: 3px 8px; margin: 2px; text-decoration: none; border-radius: 15px; font-size: 12px; color: #495057;">
-                    {{ book_tag.name }}
-                </a>{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </p>
-
-        <!-- LINHA CORRIGIDA: Agora mostra o autor real e data real de publicação -->
-        <p class="date" style="color: #6c757d; font-size: 14px;">
-            <strong>Autor:</strong> {{ book.author }} | 
-            <strong>Publicado em:</strong> {{ book.publication_date|date:"d/m/Y" }}
-        </p>
-        
-        <!-- Informação opcional: quem adicionou ao sistema -->
-        {% if user.is_staff %}
-            <p style="color: #999; font-size: 12px;">
-                <em>Adicionado ao sistema por {{ book.posted_by.username }} em {{ book.publish|date:"d/m/Y H:i" }}</em>
-            </p>
-        {% endif %}
-
-        {{ book.body|truncatewords:30|linebreaks }}
-        <div style="clear: both;"></div>
+{% if user.is_authenticated %}
+    <div style="margin: 20px 0;">
+        <a href="{% url 'virtuallibrary:emprestar_livro' book.id %}" 
+           style="background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+            📚 Emprestar este livro
+        </a>
     </div>
-{% endfor %}
+{% endif %}
 
-{% include "pagination.html" with page=books %}
+<h2>Livros similares</h2>
+{% for similar_book in similar_books %}
+    <div style="display: inline-block; margin: 10px; text-align: center; width: 150px;">
+        <a href="{{ similar_book.get_absolute_url }}">
+            {% if similar_book.cover %}
+                <img src="{{ similar_book.cover.url }}" alt="{{ similar_book.title }}" width="120" height="180">
+            {% else %}
+                <img src="{% static 'images/default_cover.png' %}" alt="Capa padrão" width="120" height="180">
+            {% endif %}
+        </a>
+        <p><a href="{{ similar_book.get_absolute_url }}">{{ similar_book.title }}</a></p>
+    </div>
+{% empty %}
+    <p>Não há livros similares.</p>
+{% endfor %}
 {% endblock %}

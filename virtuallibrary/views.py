@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
-from .models import Book, UserProfile
+from .models import Book, UserProfile, Emprestimo
 from .forms import SearchForm
 from django.conf import settings
 
@@ -80,14 +80,29 @@ def login_view(request):
     return render(request, 'login/login.html', {'message': message})
 
 def home_view(request):
-    return render(request, 'home/home.html', {'user': request.user})
-
+    emprestimos = []
+    if request.user.is_authenticated:
+        emprestimos = Emprestimo.objects.filter(user=request.user).select_related('book')
+    
+    return render(request, 'home/home.html', {
+        'user': request.user,
+        'emprestimos': emprestimos
+    })
 def logout_view(request):
     logout(request)
     return redirect('/')
 
+def emprestar_livro(request, book_id):
+    if request.user.is_authenticated:
+        book = get_object_or_404(Book, id=book_id)
+        emprestimo, created = Emprestimo.objects.get_or_create(
+            user=request.user, 
+            book=book
+        )
+        return redirect('virtuallibrary:home')  # SEM o id=book_id
+    else:
+        return redirect('virtuallibrary:login')
+
 def profile_view(request):
-    # Cria o perfil se não existir
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-    
-    return render(request, 'virtuallibrary/profile.html', {'profile': profile})
+    # Redireciona para a home
+    return redirect('virtuallibrary:home')  # ou o nome correto da sua view home

@@ -84,3 +84,13 @@ class UserProfile(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.get_tipo_perfil_display()}"
+class Emprestimo(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    data_emprestimo = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'book']  # Evita emprestar o mesmo livro duas vezes
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.book.title}"

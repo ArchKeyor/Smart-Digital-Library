@@ -12,5 +12,6 @@ urlpatterns = [
  path('login/', views.login_view, name='login'),
  path('logout/', views.logout_view, name='logout'),
  path('profile/', views.profile_view, name='profile'),
+ path('emprestar/<int:book_id>/', views.emprestar_livro, name='emprestar_livro'),
 
 ]
