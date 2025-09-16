@@ -12,6 +12,8 @@ def book_list(request, tag_slug=None):
     tag = None
     search_form = SearchForm()
     query = None
+    all_tags = Tag.objects.filter(taggit_taggeditem_items__content_type__model='book').distinct()
+
 
     if tag_slug:
         tag = get_object_or_404(Tag, slug=tag_slug)
@@ -44,7 +46,8 @@ def book_list(request, tag_slug=None):
             'books': books,
             'tag': tag,
             'search_form': search_form,
-            'query': query
+            'query': query,
+            'all_tags': all_tags,
         }
     )
 
