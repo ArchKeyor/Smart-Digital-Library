@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}My Virtual Library{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'virtuallibrary/css/virtuallibrary.css' %}">
 </head>
 <body>
     <div id="wrapper">
@@ -20,7 +19,6 @@
             <div class="auth-section">
                 {% if user.is_authenticated %}
                     <p>Olá, {{ user.username }}!</p>
-                    <p><a href="{% url 'virtuallibrary:logout' %}">Sair</a></p>
                 {% else %}
                     <p><a href="{% url 'virtuallibrary:login' %}">Entrar/Cadastrar</a></p>
                 {% endif %}

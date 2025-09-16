@@ -65,3 +65,6 @@ def book_detail(request, id):
 
 def login_view(request):
     return render(request, 'login/login.html')
+
+#def home_view(request):
+#    return render(request, 'home/home.html')  # substitua pelo caminho do seu template
