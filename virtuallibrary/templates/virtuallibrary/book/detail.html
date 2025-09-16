@@ -1,19 +1,35 @@
 {% extends "virtuallibrary/base.html" %}
+{% load static %}  <!-- necessário para imagens padrão -->
+
 {% block title %}{{ book.title }}{% endblock %}
+
 {% block content %}
- <h1>{{ book.title }}</h1>
+<h1>{{ book.title }}</h1>
+
+<!-- Capa do livro -->
+{% if book.cover %}
+    <img src="{{ book.cover.url }}" alt="{{ book.title }} cover" width="300">
+{% else %}
+    <img src="{% static 'images/default_cover.png' %}" alt="Capa padrão" width="300">
+{% endif %}
+
 <p class="date">
- Published {{ book.publish }} by {{ book.author }}
- </p>
- {{ book.body|linebreaks }}
- <h2>Similar books</h2>
- {% for book in similar_books %}
-<p>
-<a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+    Published {{ book.publish }} by {{ book.author }}
 </p>
+
+<div class="body">
+    {{ book.body|linebreaks }}
+</div>
+
+<h2>Similar books</h2>
+{% for book in similar_books %}
+    <p>
+        <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+    </p>
 {% empty %}
-    There are no similar books yet.
+    <p>There are no similar books yet.</p>
 {% endfor %}
+
 {% endblock %}
 
 
