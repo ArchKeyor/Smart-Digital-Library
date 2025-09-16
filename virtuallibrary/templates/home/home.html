@@ -8,6 +8,26 @@
         <p>Escolha um livro ou explore nossa biblioteca.</p>
     </header>
 
+    <!-- Menu de navegação -->
+    {% if user.is_authenticated %}
+    <nav style="margin: 20px 0; text-align: center;">
+        <a href="{% url 'virtuallibrary:book_list' %}" 
+           style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
+            📚 Ver Biblioteca
+        </a>
+        
+        <a href="{% url 'virtuallibrary:profile' %}" 
+           style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
+            👤 Meu Perfil
+        </a>
+        
+        <a href="{% url 'virtuallibrary:logout' %}"
+           style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
+            🚪 Sair
+        </a>
+    </nav>
+    {% endif %}
+
     <section class="home-content">
         <h2>Seus livros recomendados</h2>
         <p>Aqui você pode adicionar links ou listas dos livros.</p>
@@ -17,8 +37,4 @@
             <li><a href="#">Livro 3</a></li>
         </ul>
     </section>
-    
-    {% if user.is_authenticated %}
-    <a href="{% url 'virtuallibrary:logout' %}">Sair</a>
-    {% endif %}
 {% endblock %}

@@ -1,0 +1,29 @@
+{% extends "virtuallibrary/base.html" %}
+
+{% block title %}Perfil{% endblock %}
+
+{% block content %}
+<h1>Perfil do Usuário</h1>
+
+<!-- PAINEL 1: Info Básica -->
+<div style="border: 1px solid #ccc; padding: 20px; margin: 10px; border-radius: 5px;">
+    <h2>{{ user.get_full_name|default:user.username }}</h2>
+    <p><strong>Tipo:</strong> {{ profile.get_tipo_perfil_display }}</p>
+    {% if profile.tipo_perfil == 'estudante' and profile.curso %}
+        <p><strong>Curso:</strong> {{ profile.curso }}</p>
+    {% endif %}
+</div>
+
+<!-- PAINEL 2: Informações Pessoais -->
+<div style="border: 1px solid #ccc; padding: 20px; margin: 10px; border-radius: 5px;">
+    <h3>Informações Pessoais</h3>
+    <p><strong>Primeiro nome:</strong> {{ user.first_name|default:"Não informado" }}</p>
+    <p><strong>Último nome:</strong> {{ user.last_name|default:"Não informado" }}</p>
+    <p><strong>Data de nascimento:</strong> {{ profile.data_nascimento|default:"Não informado" }}</p>
+    <p><strong>Matrícula:</strong> {{ profile.matricula|default:"Não informado" }}</p>
+    <p><strong>Email:</strong> {{ user.email|default:"Não informado" }}</p>
+    <p><strong>Curso:</strong> {{ profile.curso|default:"Não informado" }}</p>
+</div>
+
+<a href="{% url 'virtuallibrary:book_list' %}">Voltar à biblioteca</a>
+{% endblock %}

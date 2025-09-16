@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.urls import reverse
 from taggit.managers import TaggableManager
+from django.contrib.auth.models import User
 
 # Create your models here.
 class PublishedManager(models.Manager):
@@ -53,6 +54,7 @@ class Book(models.Model):
 
     objects = models.Manager()
     published = PublishedManager()
+
     
     class Meta:
         ordering = ['-publish']
@@ -67,3 +69,18 @@ class Book(models.Model):
         return reverse(
             'virtuallibrary:book_detail', args=[self.id]
         )
+class UserProfile(models.Model):
+    TIPOS = [
+        ('estudante', 'Estudante'),
+        ('bibliotecario', 'Bibliotecário'),
+        ('professor', 'Professor'),
+    ]
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    tipo_perfil = models.CharField(max_length=20, choices=TIPOS, default='estudante')
+    data_nascimento = models.DateField(null=True, blank=True)
+    matricula = models.CharField(max_length=20, blank=True)
+    curso = models.CharField(max_length=100, blank=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_tipo_perfil_display()}"

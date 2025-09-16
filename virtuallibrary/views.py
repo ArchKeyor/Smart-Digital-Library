@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
-from .models import Book
+from .models import Book, UserProfile
 from .forms import SearchForm
 from django.conf import settings
 
@@ -85,3 +85,9 @@ def home_view(request):
 def logout_view(request):
     logout(request)
     return redirect('/')
+
+def profile_view(request):
+    # Cria o perfil se não existir
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    return render(request, 'virtuallibrary/profile.html', {'profile': profile})
