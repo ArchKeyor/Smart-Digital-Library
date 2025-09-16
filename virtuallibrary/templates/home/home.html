@@ -17,4 +17,8 @@
             <li><a href="#">Livro 3</a></li>
         </ul>
     </section>
+    
+    {% if user.is_authenticated %}
+    <a href="{% url 'virtuallibrary:logout' %}">Sair</a>
+    {% endif %}
 {% endblock %}

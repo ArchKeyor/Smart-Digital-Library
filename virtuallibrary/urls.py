@@ -10,5 +10,6 @@ urlpatterns = [
  path('tag/<slug:tag_slug>/', views.book_list, name='book_list_by_tag'),
  path('home/', views.home_view, name='home'),   # /home/ -> home
  path('login/', views.login_view, name='login'),
+ path('logout/', views.logout_view, name='logout'),
 
 ]
