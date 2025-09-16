@@ -7,6 +7,7 @@ from .models import Book, UserProfile, Emprestimo
 from .forms import SearchForm
 from django.conf import settings
 from datetime import timedelta
+from django.contrib import messages
 
 def book_list(request, tag_slug=None):
     book_list = Book.published.all()
@@ -100,6 +101,10 @@ def logout_view(request):
 
 def emprestar_livro(request, book_id):
     if request.user.is_authenticated:
+        if Emprestimo.objects.filter(user=request.user).count() >= 3:
+            messages.error(request, "Você já tem 3 livros emprestados. Devolva um livro primeiro.")
+            return redirect('virtuallibrary:book_detail', id=book_id)
+
         book = get_object_or_404(Book, id=book_id)
         emprestimo, created = Emprestimo.objects.get_or_create(
             user=request.user, 
@@ -108,7 +113,15 @@ def emprestar_livro(request, book_id):
         return redirect('virtuallibrary:home')  # SEM o id=book_id
     else:
         return redirect('virtuallibrary:login')
+    
+def devolver_livro(request, emprestimo_id):
+    if request.user.is_authenticated:
+        emprestimo = get_object_or_404(Emprestimo, id=emprestimo_id, user=request.user)
+        emprestimo.delete()
+        messages.success(request, f"Livro '{emprestimo.book.title}' devolvido com sucesso!")
+    return redirect('virtuallibrary:home')
 
 def profile_view(request):
     # Redireciona para a home
     return redirect('virtuallibrary:home')  # ou o nome correto da sua view home
+    

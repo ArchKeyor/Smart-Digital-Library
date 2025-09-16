@@ -4,6 +4,16 @@
 {% block title %}{{ book.title }}{% endblock %}
 
 {% block content %}
+
+<!-- Mensagens de erro/sucesso -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'error' %}
+            <p style="color: red;">{{ message }}</p>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
 <h1>{{ book.title }}</h1>
 
 {% if book.cover %}

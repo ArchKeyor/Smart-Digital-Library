@@ -50,7 +50,15 @@
                     <p><strong>Autor:</strong> {{ emprestimo.book.author }}</p>
                     <p><strong>Emprestado em:</strong> {{ emprestimo.data_emprestimo|date:"d/m/Y" }}</p>
                     <p><strong>Data de devolução:</strong> {{ emprestimo.data_devolucao|date:"d/m/Y" }}</p>
+                    
+                    <!-- BOTÃO DE DEVOLUÇÃO -->
+                    <a href="{% url 'virtuallibrary:devolver_livro' emprestimo.id %}" 
+                        style="background-color: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; margin-top: 10px; display: inline-block;">
+                            📤 Devolver Livro
+                    </a>
+
                     <div style="clear: both;"></div>
+
                 </div>
             {% endfor %}
         {% else %}
