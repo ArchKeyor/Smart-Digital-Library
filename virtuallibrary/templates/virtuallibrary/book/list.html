@@ -6,7 +6,7 @@
 {% block content %}
 <h1>My virtuallibrary</h1>
 
-<!-- FILTROS POR CATEGORIA/TAG - ADICIONAR ESTA SEÇÃO -->
+<!-- FILTROS POR CATEGORIA/TAG -->
 <div class="category-filters" style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
     <h3>Filtrar por Categoria:</h3>
     
@@ -65,8 +65,10 @@
             {% endfor %}
         </p>
 
-        <p class="date" style="color: #6c757d; font-size: 14px;">
-            Published {{ book.publish }} by {{ book.author }}
+        <!-- INFORMAÇÕES CORRETAS DO LIVRO -->
+        <p class="book-info" style="color: #6c757d; font-size: 14px; margin: 10px 0;">
+            <strong>Autor:</strong> {{ book.author }} | 
+            <strong>Publicado em:</strong> {{ book.publication_date|date:"d/m/Y" }}
         </p>
 
         {{ book.body|truncatewords:30|linebreaks }}
