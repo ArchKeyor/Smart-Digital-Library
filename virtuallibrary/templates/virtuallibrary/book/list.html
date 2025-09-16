@@ -1,4 +1,5 @@
 {% extends "virtuallibrary/base.html" %}
+{% load static %}
 
 {% block title %}My virtuallibrary{% endblock %}
 
@@ -15,6 +16,13 @@
  </form>
 
 {% for book in books %}
+    {% if book.cover %}
+        <img src="{{ book.cover.url }}" alt="{{ book.title }} cover" width="150">
+    {% else %}
+        <!-- capa padrão opcional -->
+        <img src="{% static 'images/default_cover.png' %}" alt="Capa padrão" width="150">
+    {% endif %}
+
     <h2>
         <a href="{% url 'virtuallibrary:book_detail' book.id %}">
             {{ book.title }}

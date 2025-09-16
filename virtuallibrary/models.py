@@ -23,6 +23,12 @@ class Book(models.Model):
         on_delete=models.CASCADE,
         related_name='book_written',
     )
+        # campo de capa
+    cover = models.ImageField(
+        upload_to='book_covers/',  # pasta dentro de MEDIA_ROOT
+        blank=True,
+        null=True
+    )
 
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
@@ -35,7 +41,6 @@ class Book(models.Model):
 
     objects = models.Manager()
     published = PublishedManager()
-
     class Meta:
         ordering = ['-publish']
         indexes = [
