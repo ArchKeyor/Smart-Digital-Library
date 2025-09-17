@@ -43,5 +43,13 @@ admin.site.register(User, UserAdmin)
 # Se quiser também pode registrar separado
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "tipo_perfil", "primeiro_nome", "ultimo_nome")
+        list_display = (
+        "user", 
+        "tipo_perfil", 
+        "primeiro_nome", 
+        "ultimo_nome",
+        "curso",          
+        "matricula",      
+        "data_nascimento" 
+    )
     

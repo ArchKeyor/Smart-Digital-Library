@@ -71,7 +71,9 @@ class UserProfile(models.Model):
     tipo_perfil = models.CharField(max_length=20, choices=TIPOS, default='estudante')
     primeiro_nome = models.CharField(max_length=50, blank=True, null=True)
     ultimo_nome = models.CharField(max_length=50, blank=True, null=True)
-    bio = models.TextField(blank=True, null=True)
+    curso = models.TextField(max_length=100,blank=True,null=True)
+    matricula = models.CharField(max_length=30,blank=True,null=True)
+    data_nascimento = models.DateField(blank=True, null=True)
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
 
     def __str__(self):
