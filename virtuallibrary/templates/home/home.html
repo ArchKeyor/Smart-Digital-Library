@@ -83,3 +83,135 @@
         {% endif %}
     </section>
 {% endblock %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Digital</title>
+    <link rel="stylesheet" href="/virtuallibrary/static/css/home.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo-container">
+            <img src="media/logo.png" alt="Logo" class="logo-img">
+            <div class="welcome">Bem vindo,<br><strong>(Fulano)!</strong></div>
+        </div>
+
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#books">Meus livros</a></li>
+                <li><a href="#discover">Descubra</a></li>
+                <li><a href="#club">Clube do livro</a></li>
+                <li><a href="#collections">Coleções</a></li>
+                <li><a href="#history">Histórico</a></li>
+                <li><a href="#support">Suporte</a></li>
+                <li><a href="#settings">Configurações</a></li>
+            </ul>
+        </nav>
+
+        <a href="#logout" class="logout">
+            🚪 Log out
+        </a>
+    </aside>
+
+    <main class="main-content">        
+        <section class="content-section fade-in">
+            <h2 class="section-title">Empréstimos</h2>
+            <div class="loans">
+                <div class="book-card">
+                    <h3>Código limpo</h3>
+                </div>
+                <div class="book-card">
+                    <h3>Python Fluent</h3>
+                </div>
+                <div class="book-card">
+                    <h3>Django 5 by Example</h3>
+                </div>
+            </div>
+            <!-- <button class="nav-arrow">❯</button> -->
+        </section>
+
+        <section class="content-section fade-in">
+            <h2 class="section-title">Recomendados</h2>
+            <div class="categories">
+                <button class="category-btn active">Todos</button>
+                <button class="category-btn">Tecnologia</button>
+                <button class="category-btn">Computaria</button>
+                <button class="category-btn">Ciências</button>
+            </div>
+            <div class="books-grid">
+                <div class="book-card">
+                    <h3>Código limpo</h3>
+                </div>
+                <div class="book-card">
+                    <h3>Código limpo</h3>
+                </div>
+                <div class="book-card">
+                    <h3>Código limpo</h3>
+                </div>
+                <div class="book-card">
+                    <h3>Código limpo</h3>
+                </div>
+            </div>
+             <button class="nav-arrow">❯</button>
+        </section>
+    </main>
+
+    <aside class="right-sidebar">
+        <div class="sidebar-section">
+            <h3>Fila de espera</h3>
+            <div class="item">
+                <h4>Nome livro</h4>
+                <p>Disponibilidade</p>
+            </div>
+            <div class="item">
+                <h4>Nome livro</h4>
+                <p>Disponibilidade</p>
+            </div>
+            <div class="item">
+                <h4>Nome livro</h4>
+                <p>Disponibilidade</p>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3>Datas de entrega</h3>
+            <div class="item">
+                <h4>Nome livro</h4>
+                <p>Data entrega</p>
+            </div>
+            <div class="item">
+                <h4>Nome livro</h4>
+                <p>Data entrega</p>
+            </div>
+            <div class="item">
+                <h4>Nome livro</h4>
+                <p>Data entrega</p>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3>Coleções de professores</h3>
+            <div class="professor-item">
+                <div class="professor-avatar"></div>
+                <div class="professor-name">Nome</div>
+            </div>
+            <div class="professor-item">
+                <div class="professor-avatar"></div>
+                <div class="professor-name">Nome</div>
+            </div>
+            <div class="professor-item">
+                <div class="professor-avatar"></div>
+                <div class="professor-name">Nome</div>
+            </div>
+            <div class="professor-item">
+                <div class="professor-avatar"></div>
+                <div class="professor-name">Nome</div>
+            </div>
+        </div>
+    </aside>
+</body>
+</html>
