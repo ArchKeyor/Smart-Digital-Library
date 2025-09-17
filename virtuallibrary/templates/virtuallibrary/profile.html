@@ -1,106 +1,233 @@
-{% extends "virtuallibrary/base.html" %}
 {% load static %}
-
-{% block title %}Meu Perfil - Virtual Library{% endblock %}
-
-{% block content %}
-    <header>
-        <h1>👤 Meu Perfil</h1>
-        <p>Gerencie suas informações pessoais</p>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - Virtual Library</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <span class="logo-text">Virtual Library</span>
+            </div>
+            
+            <div class="search-section">
+                <div class="search-container">
+                    <input type="text" placeholder="Pesquisar..." class="search-input">
+                    <button class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="user-menu">
+                </div>
+            </div>
+        </div>
     </header>
 
-    <!-- Navegação -->
-    <nav style="margin: 20px 0; text-align: center;">
-        <a href="{% url 'virtuallibrary:home' %}" 
-           style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
-            ← Voltar ao Início
-        </a>
-        
-        <a href="{% url 'virtuallibrary:book_list' %}" 
-           style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
-            📚 Ver Biblioteca
-        </a>
-    </nav>
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="{% url 'virtuallibrary:book_list' %}" class="nav-item">
+                    <span>Meus Livros</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>Notificações</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>Mensagens</span>
+                </a>
+                <a href="{% url 'virtuallibrary:home' %}" class="nav-item">
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>Amigos</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>Clube do livro</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <span>Perfil</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>Histórico</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>Contato</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>Suporte</span>
+                </a>
+            </nav>
+        </aside>
 
-    <!-- Informações do Perfil -->
-    <section style="max-width: 800px; margin: 0 auto;">
-        <div style="border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 5px; background: #f8f9fa;">
-            <h2>📋 Informações Pessoais</h2>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
-                <div>
-                    <p><strong>Usuário:</strong> {{ user.username }}</p>
-                    <p><strong>Email:</strong> {{ user.email|default:"Não informado" }}</p>
-                    <p><strong>Nome Completo:</strong> {{ profile.nome_completo|default:"Não informado" }}</p>
-                    <p><strong>Tipo de Perfil:</strong> {{ profile.get_tipo_perfil_display }}</p>
-                </div>
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Profile Header -->
+            <div class="profile-header-card">
+                <h1 class="page-title">Meu Perfil</h1>
                 
-                <div>
-                    <p><strong>Matrícula:</strong> {{ profile.matricula|default:"Não informado" }}</p>
-                    <p><strong>Curso:</strong> {{ profile.curso|default:"Não informado" }}</p>
-                    <p><strong>Data de Nascimento:</strong> {{ profile.data_nascimento|date:"d/m/Y"|default:"Não informado" }}</p>
-                    <p><strong>Membro desde:</strong> {{ user.date_joined|date:"d/m/Y" }}</p>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 20px;">
-                <button style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-                    ✏️ Editar Perfil
-                </button>
-            </div>
-        </div>
-
-        <!-- Estatísticas -->
-        <div style="border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 5px;">
-            <h2>📊 Suas Estatísticas</h2>
-            
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;">
-                <div style="background: #e3f2fd; padding: 15px; border-radius: 5px;">
-                    <h3 style="margin: 0; color: #1976d2;">{{ emprestimos.count }}</h3>
-                    <p style="margin: 5px 0 0 0;">Livros Emprestados</p>
-                </div>
-                
-                <div style="background: #f3e5f5; padding: 15px; border-radius: 5px;">
-                    <h3 style="margin: 0; color: #7b1fa2;">0</h3>
-                    <p style="margin: 5px 0 0 0;">Livros Devolvidos</p>
-                </div>
-                
-                <div style="background: #e8f5e8; padding: 15px; border-radius: 5px;">
-                    <h3 style="margin: 0; color: #388e3c;">{{ user.date_joined|timesince }}</h3>
-                    <p style="margin: 5px 0 0 0;">Tempo na plataforma</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Livros Emprestados -->
-        {% if emprestimos %}
-        <div style="border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 5px;">
-            <h2>📚 Meus Livros Emprestados</h2>
-            
-            {% for emprestimo in emprestimos %}
-                <div style="border: 1px solid #eee; padding: 15px; margin: 10px 0; border-radius: 5px; background: white;">
-                    {% if emprestimo.book.cover %}
-                        <img src="{{ emprestimo.book.cover.url }}" alt="{{ emprestimo.book.title }}" width="60" style="float: left; margin-right: 15px;">
-                    {% else %}
-                        <div style="width: 60px; height: 80px; background: #f0f0f0; float: left; margin-right: 15px; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 10px; color: #666; text-align: center;">
-                            Sem capa
+                <div class="profile-main-info">
+                    <div class="profile-avatar-section">
+                        <div class="large-avatar">
+                            <i class="fas fa-user"></i>
                         </div>
-                    {% endif %}
-                    
-                    <h4 style="margin: 0 0 5px 0;">
-                        <a href="{% url 'virtuallibrary:book_detail' emprestimo.book.id %}" style="text-decoration: none; color: #007bff;">
-                            {{ emprestimo.book.title }}
-                        </a>
-                    </h4>
-                    <p style="margin: 0; color: #666; font-size: 14px;">{{ emprestimo.book.author }}</p>
-                    <p style="margin: 5px 0 0 0; font-size: 12px; color: #888;">
-                        Emprestado em {{ emprestimo.data_emprestimo|date:"d/m/Y" }}
-                    </p>
-                    
-                    <div style="clear: both;"></div>
+                        <div class="profile-basic-info">
+                            <h2 class="profile-name">{{ profile.nome_completo|default:user.username }}</h2>
+                            <p class="profile-role">{{ profile.get_tipo_perfil_display|default:"Estudante" }}</p>
+                            <p class="profile-detail">{{ profile.curso|default:"Engenharia de Software" }}</p>
+                        </div>
+                    </div>
                 </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </section>
-{% endblock %}
+            </div>
+
+            <!-- Profile Content -->
+            <div class="profile-content">
+                <!-- Informações Pessoais Card -->
+                <div class="info-card">
+                    <h3 class="card-title">Informações Pessoais</h3>
+                    
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <div class="info-item">
+                                <label>Nome Completo</label>
+                                <span>{{ profile.nome_completo|default:"Não informado" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Endereço</label>
+                                <span>{{ profile.endereco|default:"Não informado" }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-item">
+                                <label>Telefone</label>
+                                <span>{{ profile.telefone|default:"Não informado" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Data de Nascimento</label>
+                                <span>{{ profile.data_nascimento|date:"d/m/Y"|default:"Não informado" }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-item">
+                                <label>Email</label>
+                                <span>{{ user.email|default:"Não informado" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Curso</label>
+                                <span>{{ profile.curso|default:"Engenharia de Software" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Virtual Library VDB Card -->
+                <div class="vdb-card">
+                    <h3 class="card-title">Virtual Library</h3>
+                    
+                    <div class="vdb-content">
+                        <div class="vdb-column">
+                            <h4>Produtos</h4>
+                            <div class="vdb-links">
+                                <a href="{% url 'virtuallibrary:book_list' %}">Sistema de Biblioteca</a>
+                                <a href="#">Controle de Empréstimos</a>
+                                <a href="#">Reservas Online</a>
+                                <a href="#">Catalogação</a>
+                            </div>
+                        </div>
+                        
+                        <div class="vdb-column">
+                            <h4>Recursos</h4>
+                            <div class="vdb-links">
+                                <a href="#">Suporte</a>
+                                <a href="#">Tutoriais</a>
+                                <a href="#">Documentação</a>
+                                <a href="#">FAQ</a>
+                            </div>
+                        </div>
+                        
+                        <div class="vdb-column">
+                            <h4>Empresa</h4>
+                            <div class="vdb-links">
+                                <a href="#">Desenvolvedores</a>
+                                <a href="#">Carreira</a>
+                                <a href="#">Contato</a>
+                                <a href="#">Blog</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meus Livros Emprestados -->
+                {% if emprestimos %}
+                <div class="books-card">
+                    <h3 class="card-title">Meus Livros Emprestados ({{ emprestimos.count }})</h3>
+                    
+                    <div class="books-grid">
+                        {% for emprestimo in emprestimos %}
+                        <div class="book-item">
+                            <div class="book-cover">
+                                {% if emprestimo.book.cover %}
+                                    <img src="{{ emprestimo.book.cover.url }}" alt="{{ emprestimo.book.title }}">
+                                {% else %}
+                                    <div class="no-cover">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="book-info">
+                                <h5>{{ emprestimo.book.title }}</h5>
+                                <p>{{ emprestimo.book.author }}</p>
+                                <span class="loan-date">Emprestado em {{ emprestimo.data_emprestimo|date:"d/m/Y" }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Estatísticas do Usuário -->
+                <div class="stats-card">
+                    <h3 class="card-title">Minhas Estatísticas</h3>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ emprestimos.count }}</div>
+                            <div class="stat-label">Livros Emprestados</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Livros Devolvidos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ user.date_joined|timesince }}</div>
+                            <div class="stat-label">Tempo na Plataforma</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ user.date_joined|date:"d/m/Y" }}</div>
+                            <div class="stat-label">Criação da Conta</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
