@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Book
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from .models import Book, UserProfile
 
 # Register your models here.
 
@@ -24,4 +26,22 @@ class BookAdmin(admin.ModelAdmin):
             'classes': ('collapse',)  # Seção recolhível
         }),
     )
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = "Perfil do usuário"
+
+# Re-registrar o User já com o inline
+class UserAdmin(BaseUserAdmin):
+    inlines = (UserProfileInline,)
+
+# Primeiro remove o User padrão
+admin.site.unregister(User)
+# Agora registra o novo com o inline
+admin.site.register(User, UserAdmin)
+
+# Se quiser também pode registrar separado
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "tipo_perfil", "primeiro_nome", "ultimo_nome")
     

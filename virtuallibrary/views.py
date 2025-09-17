@@ -1,10 +1,10 @@
 from taggit.models import Tag
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test,login_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
-from .models import Book, Emprestimo
+from .models import Book, Emprestimo, UserProfile
 from .forms import SearchForm
 from django.conf import settings
 from datetime import timedelta, date
@@ -123,10 +123,20 @@ def devolver_livro(request, emprestimo_id):
         messages.success(request, f"Livro '{emprestimo.book.title}' devolvido com sucesso!")
     return redirect('virtuallibrary:home')
 
-def profile_view(request):
-    # Redireciona para a home
-    return redirect('virtuallibrary:home')
-
+@login_required
+def profile(request):
+    # Pega ou cria o perfil do usuário
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    # Pega os empréstimos do usuário
+    emprestimos = Emprestimo.objects.filter(user=request.user).select_related('book')
+    
+    context = {
+        'profile': profile,
+        'emprestimos': emprestimos,
+    }
+    
+    return render(request, 'virtuallibrary/profile.html', context)
 # Funções de verificação de grupos
 def is_bibliotecario(user):
     return user.is_authenticated and user.groups.filter(name='Bibliotecário').exists()
