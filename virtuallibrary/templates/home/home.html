@@ -22,6 +22,18 @@
             👤 Meu Perfil
         </a>
         
+        <!-- Botão apenas para bibliotecários -->
+        {% if user.groups.all %}
+            {% for group in user.groups.all %}
+                {% if group.name == 'Bibliotecário' %}
+                    <a href="{% url 'virtuallibrary:gerenciar_acervo' %}" 
+                       style="background: #6f42c1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
+                        🔧 Gerenciar Acervo
+                    </a>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
         <a href="{% url 'virtuallibrary:logout' %}"
            style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
             🚪 Sair
@@ -39,7 +51,9 @@
                     {% if emprestimo.book.cover %}
                         <img src="{{ emprestimo.book.cover.url }}" alt="{{ emprestimo.book.title }}" width="80" style="float: left; margin-right: 15px;">
                     {% else %}
-                        <img src="{% static 'images/default_cover.png' %}" alt="Capa padrão" width="80" style="float: left; margin-right: 15px;">
+                        <div style="width: 80px; height: 120px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 12px; color: #666; text-align: center;">
+                            Sem capa
+                        </div>
                     {% endif %}
                     
                     <h3>
@@ -58,7 +72,6 @@
                     </a>
 
                     <div style="clear: both;"></div>
-
                 </div>
             {% endfor %}
         {% else %}

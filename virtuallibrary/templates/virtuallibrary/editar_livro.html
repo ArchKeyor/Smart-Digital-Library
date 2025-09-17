@@ -1,0 +1,90 @@
+{% extends "virtuallibrary/base.html" %}
+
+{% block title %}Editar Livro - {{ book.title }}{% endblock %}
+
+{% block content %}
+<h1>✏️ Editar Livro: {{ book.title }}</h1>
+
+<!-- Mensagens de sucesso/erro -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <p style="color: green; background: #d4edda; padding: 10px; border-radius: 5px;">{{ message }}</p>
+        {% elif message.tags == 'error' %}
+            <p style="color: red; background: #f8d7da; padding: 10px; border-radius: 5px;">{{ message }}</p>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div style="margin: 15px 0;">
+            <label><strong>Título:</strong></label><br>
+            <input type="text" name="title" value="{{ book.title }}" required 
+                   style="width: 100%; padding: 8px; border-radius: 3px; border: 1px solid #ddd;">
+        </div>
+        
+        <div style="margin: 15px 0;">
+            <label><strong>Autor:</strong></label><br>
+            <input type="text" name="author" value="{{ book.author }}" required 
+                   style="width: 100%; padding: 8px; border-radius: 3px; border: 1px solid #ddd;">
+        </div>
+        
+        <div style="margin: 15px 0;">
+            <label><strong>Descrição:</strong></label><br>
+            <textarea name="body" rows="6" 
+                      style="width: 100%; padding: 8px; border-radius: 3px; border: 1px solid #ddd;">{{ book.body }}</textarea>
+        </div>
+        
+        <div style="margin: 15px 0;">
+            <label><strong>Data de Publicação:</strong></label><br>
+            <input type="date" name="publication_date" value="{{ book.publication_date|date:'Y-m-d' }}" 
+                   style="padding: 8px; border-radius: 3px; border: 1px solid #ddd;">
+        </div>
+        
+        <div style="margin: 15px 0;">
+            <label><strong>Capa Atual:</strong></label><br>
+            {% if book.cover %}
+                <img src="{{ book.cover.url }}" alt="{{ book.title }}" width="120" style="margin: 10px 0; border-radius: 3px;">
+                <br><small style="color: #666;">Selecione uma nova imagem para substituir a capa atual</small><br>
+            {% else %}
+                <p style="color: #666;">Nenhuma capa definida</p>
+            {% endif %}
+            <input type="file" name="cover" accept="image/*" style="padding: 8px;">
+        </div>
+        
+        <div style="margin: 15px 0;">
+            <label><strong>Tags (separadas por vírgula):</strong></label><br>
+            <input type="text" name="tags" value="{{ current_tags }}" 
+                   placeholder="ficção, aventura, romance" 
+                   style="width: 100%; padding: 8px; border-radius: 3px; border: 1px solid #ddd;">
+            <small style="color: #666;">Tags atuais: {{ current_tags|default:"Nenhuma" }}</small>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <button type="submit" 
+                    style="background: #28a745; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                💾 Salvar Alterações
+            </button>
+            
+            <a href="{% url 'virtuallibrary:gerenciar_acervo' %}" 
+               style="background: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Informações do livro -->
+<div style="background: white; padding: 15px; border-radius: 5px; border: 1px solid #ddd;">
+    <h3>📖 Informações atuais</h3>
+    <p><strong>Adicionado por:</strong> {{ book.posted_by.username }}</p>
+    <p><strong>Data de criação:</strong> {{ book.created|date:"d/m/Y H:i" }}</p>
+    <p><strong>Última atualização:</strong> {{ book.updated|date:"d/m/Y H:i" }}</p>
+    <p><strong>Status:</strong> {{ book.get_status_display }}</p>
+    <p><strong>Slug:</strong> {{ book.slug }}</p>
+</div>
+
+{% endblock %}

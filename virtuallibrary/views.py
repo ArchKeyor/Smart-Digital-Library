@@ -1,13 +1,15 @@
 from taggit.models import Tag
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
-from .models import Book, UserProfile, Emprestimo
+from .models import Book, Emprestimo
 from .forms import SearchForm
 from django.conf import settings
-from datetime import timedelta
+from datetime import timedelta, date
 from django.contrib import messages
+from django.utils.text import slugify
 
 def book_list(request, tag_slug=None):
     book_list = Book.published.all()
@@ -27,7 +29,7 @@ def book_list(request, tag_slug=None):
             book_list = book_list.filter(
                 Q(title__icontains=query) | 
                 Q(body__icontains=query) |
-                Q(author__icontains=query)  # CORRIGIDO: agora busca pelo nome do autor real
+                Q(author__icontains=query)
             ).distinct()
 
     paginator = Paginator(book_list, 3)
@@ -75,7 +77,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect(settings.LOGIN_REDIRECT_URL)  # redireciona para /virtuallibrary/home/
+            return redirect(settings.LOGIN_REDIRECT_URL)
         else:
             message = 'Usuário ou senha inválidos'
 
@@ -110,7 +112,7 @@ def emprestar_livro(request, book_id):
             user=request.user, 
             book=book
         )
-        return redirect('virtuallibrary:home')  # SEM o id=book_id
+        return redirect('virtuallibrary:home')
     else:
         return redirect('virtuallibrary:login')
     
@@ -123,5 +125,133 @@ def devolver_livro(request, emprestimo_id):
 
 def profile_view(request):
     # Redireciona para a home
-    return redirect('virtuallibrary:home')  # ou o nome correto da sua view home
+    return redirect('virtuallibrary:home')
+
+# Funções de verificação de grupos
+def is_bibliotecario(user):
+    return user.is_authenticated and user.groups.filter(name='Bibliotecário').exists()
+
+def is_professor(user):
+    return user.is_authenticated and user.groups.filter(name='Professor').exists()
+
+# Views exclusivas para bibliotecários
+@user_passes_test(is_bibliotecario)
+def gerenciar_acervo(request):
+    books = Book.objects.all().order_by('-created')
+    paginator = Paginator(books, 10)  # 10 livros por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
+    return render(request, 'virtuallibrary/gerenciar_acervo.html', {
+        'books': page_obj,
+        'page_obj': page_obj
+    })
+
+@user_passes_test(is_bibliotecario)
+def adicionar_livro(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        author = request.POST.get('author')
+        body = request.POST.get('body', '')
+        publication_date = request.POST.get('publication_date')
+        cover = request.FILES.get('cover')
+        tags_input = request.POST.get('tags', '')
+        
+        # Criar o slug automaticamente
+        slug = slugify(title)
+        
+        # Verificar se já existe um livro com esse slug
+        counter = 1
+        original_slug = slug
+        while Book.objects.filter(slug=slug).exists():
+            slug = f"{original_slug}-{counter}"
+            counter += 1
+        
+        # Criar o livro
+        book = Book.objects.create(
+            title=title,
+            slug=slug,
+            author=author,
+            body=body,
+            publication_date=publication_date or date.today(),
+            cover=cover,
+            posted_by=request.user,
+            status='PB'  # Published
+        )
+        
+        # Processar tags
+        if tags_input:
+            tag_names = [tag.strip() for tag in tags_input.split(',')]
+            for tag_name in tag_names:
+                if tag_name:
+                    tag, created = Tag.objects.get_or_create(
+                        name=tag_name,
+                        defaults={'slug': slugify(tag_name)}
+                    )
+                    book.tags.add(tag)
+        
+        messages.success(request, f"Livro '{title}' adicionado com sucesso!")
+        return redirect('virtuallibrary:gerenciar_acervo')
+    
+    return render(request, 'virtuallibrary/adicionar_livro.html')
+
+@user_passes_test(is_bibliotecario)
+def editar_livro(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    
+    if request.method == 'POST':
+        book.title = request.POST.get('title')
+        book.author = request.POST.get('author')
+        book.body = request.POST.get('body', '')
+        tags_input = request.POST.get('tags', '')
+        
+        publication_date = request.POST.get('publication_date')
+        if publication_date:
+            book.publication_date = publication_date
+            
+        # Verificar se foi enviada uma nova capa
+        new_cover = request.FILES.get('cover')
+        if new_cover:
+            book.cover = new_cover
+            
+        # Atualizar slug se o título mudou
+        new_slug = slugify(book.title)
+        if new_slug != book.slug:
+            counter = 1
+            original_slug = new_slug
+            while Book.objects.filter(slug=new_slug).exclude(id=book.id).exists():
+                new_slug = f"{original_slug}-{counter}"
+                counter += 1
+            book.slug = new_slug
+        
+        # Atualizar tags
+        book.tags.clear()  # Remove todas as tags antigas
+        if tags_input:
+            tag_names = [tag.strip() for tag in tags_input.split(',')]
+            for tag_name in tag_names:
+                if tag_name:
+                    tag, created = Tag.objects.get_or_create(
+                        name=tag_name,
+                        defaults={'slug': slugify(tag_name)}
+                    )
+                    book.tags.add(tag)
+        
+        book.save()
+        messages.success(request, f"Livro '{book.title}' atualizado com sucesso!")
+        return redirect('virtuallibrary:gerenciar_acervo')
+    
+    # Para mostrar as tags atuais no formulário de edição
+    current_tags = ', '.join([tag.name for tag in book.tags.all()])
+    
+    return render(request, 'virtuallibrary/editar_livro.html', {
+        'book': book,
+        'current_tags': current_tags
+    })
+
+@user_passes_test(is_bibliotecario) 
+def deletar_livro(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    title = book.title
+    book.delete()
+    messages.success(request, f"Livro '{title}' removido com sucesso!")
+    return redirect('virtuallibrary:gerenciar_acervo')
