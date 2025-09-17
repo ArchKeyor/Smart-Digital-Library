@@ -47,15 +47,19 @@
 
 <h2>Livros similares</h2>
 {% for similar_book in similar_books %}
-    <div style="display: inline-block; margin: 10px; text-align: center; width: 150px;">
+    <div style="display: inline-block; margin: 10px; text-align: left; width: 150px;">
         <a href="{{ similar_book.get_absolute_url }}">
             {% if similar_book.cover %}
                 <img src="{{ similar_book.cover.url }}" alt="{{ similar_book.title }}" width="120" height="180">
             {% else %}
-                <img src="{% static 'images/default_cover.png' %}" alt="Capa padrão" width="120" height="180">
+                <div style="width: 120px; height: 180px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 12px; color: #666; text-align: center;">
+                    Sem capa
+                </div>
             {% endif %}
+            <div style="margin-top: 5px; font-size: 14px; font-weight: bold; color: #333;">
+                {{ similar_book.title }}
+            </div>
         </a>
-        <p><a href="{{ similar_book.get_absolute_url }}">{{ similar_book.title }}</a></p>
     </div>
 {% empty %}
     <p>Não há livros similares.</p>
