@@ -19,23 +19,17 @@
                 <span class="logo-text">Virtual Library</span>
             </div>
             
-            <div class="search-section">
-                <div class="search-container">
-                    <input type="text" placeholder="Pesquisar..." class="search-input">
-                    <button class="search-btn">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-            
+            <!-- Header
             <div class="header-actions">
                 <button class="notification-btn">
                     <i class="fas fa-bell"></i>
                 </button>
                 <div class="user-menu">
                 </div>
-            </div>
+            </div> -->
+            
         </div>
+
     </header>
 
     <!-- Main Layout -->
@@ -138,43 +132,6 @@
                     </div>
                 </div>
 
-                <!-- Virtual Library VDB Card -->
-                <div class="vdb-card">
-                    <h3 class="card-title">Virtual Library</h3>
-                    
-                    <div class="vdb-content">
-                        <div class="vdb-column">
-                            <h4>Produtos</h4>
-                            <div class="vdb-links">
-                                <a href="{% url 'virtuallibrary:book_list' %}">Sistema de Biblioteca</a>
-                                <a href="#">Controle de Empréstimos</a>
-                                <a href="#">Reservas Online</a>
-                                <a href="#">Catalogação</a>
-                            </div>
-                        </div>
-                        
-                        <div class="vdb-column">
-                            <h4>Recursos</h4>
-                            <div class="vdb-links">
-                                <a href="#">Suporte</a>
-                                <a href="#">Tutoriais</a>
-                                <a href="#">Documentação</a>
-                                <a href="#">FAQ</a>
-                            </div>
-                        </div>
-                        
-                        <div class="vdb-column">
-                            <h4>Empresa</h4>
-                            <div class="vdb-links">
-                                <a href="#">Desenvolvedores</a>
-                                <a href="#">Carreira</a>
-                                <a href="#">Contato</a>
-                                <a href="#">Blog</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Meus Livros Emprestados -->
                 {% if emprestimos %}
                 <div class="books-card">
@@ -223,6 +180,43 @@
                         <div class="stat-item">
                             <div class="stat-number">{{ user.date_joined|date:"d/m/Y" }}</div>
                             <div class="stat-label">Criação da Conta</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Virtual Library VDB Card -->
+                <div class="vdb-card">
+                    <h3 class="card-title">Virtual Library</h3>
+                    
+                    <div class="vdb-content">
+                        <div class="vdb-column">
+                            <h4>Produtos</h4>
+                            <div class="vdb-links">
+                                <a href="{% url 'virtuallibrary:book_list' %}">Sistema de Biblioteca</a>
+                                <a href="#">Controle de Empréstimos</a>
+                                <a href="#">Reservas Online</a>
+                                <a href="#">Catalogação</a>
+                            </div>
+                        </div>
+                        
+                        <div class="vdb-column">
+                            <h4>Recursos</h4>
+                            <div class="vdb-links">
+                                <a href="#">Suporte</a>
+                                <a href="#">Tutoriais</a>
+                                <a href="#">Documentação</a>
+                                <a href="#">FAQ</a>
+                            </div>
+                        </div>
+                        
+                        <div class="vdb-column">
+                            <h4>Empresa</h4>
+                            <div class="vdb-links">
+                                <a href="#">Desenvolvedores</a>
+                                <a href="#">Carreira</a>
+                                <a href="#">Contato</a>
+                                <a href="#">Blog</a>
+                            </div>
                         </div>
                     </div>
                 </div>

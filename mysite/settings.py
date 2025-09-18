@@ -130,6 +130,7 @@ LOGOUT_REDIRECT_URL = '/'       # volta para a tela de login após logout
 
 STATIC_URL = '/static/'
 
+
 STATICFILES_DIRS = [
     BASE_DIR / 'virtuallibrary' / 'static',
 ]

@@ -1,2 +1,2 @@
-Django==5.0.14
-django-taggit==6.1.0
+Django~=5.0.14
+django-taggit~=6.1.0

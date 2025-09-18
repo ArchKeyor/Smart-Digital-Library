@@ -1,217 +1,160 @@
-{% extends "virtuallibrary/base.html" %}
 {% load static %}
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Meu Perfil - Virtual Library</title>
+        <link rel="stylesheet" href="{% static 'css/home.css' %}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-{% block title %}Home - Virtual Library{% endblock %}
+    </head>
+    <body>
+        <aside class="sidebar">
+            <div class="logo-container">
+                <i class="fas fa-book"></i>
+                <div class="welcome">Bem vindo,<br><strong>{{ user.username }}!</strong></div>
+            </div>
 
-{% block content %}
-    <header>
-        <h1>Bem-vindo à Virtual Library, {{ user.username }}!</h1>
-        <p>Escolha um livro ou explore nossa biblioteca.</p>
-    </header>
-
-    <!-- Menu de navegação -->
-    {% if user.is_authenticated %}
-    <nav style="margin: 20px 0; text-align: center;">
-        <a href="{% url 'virtuallibrary:book_list' %}" 
-           style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
-            📚 Ver Biblioteca
-        </a>
-        
-        <a href="{% url 'virtuallibrary:profile' %}" 
-           style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
-            👤 Meu Perfil
-        </a>
-        
-        <!-- Botão apenas para bibliotecários -->
-        {% if user.groups.all %}
-            {% for group in user.groups.all %}
-                {% if group.name == 'Bibliotecário' %}
-                    <a href="{% url 'virtuallibrary:gerenciar_acervo' %}" 
-                       style="background: #6f42c1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
-                        🔧 Gerenciar Acervo
-                    </a>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-        
-        <a href="{% url 'virtuallibrary:logout' %}"
-           style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; display: inline-block;">
-            🚪 Sair
-        </a>
-    </nav>
-    {% endif %}
-
-    <!-- SEÇÃO DE LIVROS EMPRESTADOS -->
-    <section class="home-content">
-        <h2>📚 Seus Livros Emprestados</h2>
-        
-        {% if emprestimos %}
-            {% for emprestimo in emprestimos %}
-                <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                    {% if emprestimo.book.cover %}
-                        <img src="{{ emprestimo.book.cover.url }}" alt="{{ emprestimo.book.title }}" width="80" style="float: left; margin-right: 15px;">
-                    {% else %}
-                        <div style="width: 80px; height: 120px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 12px; color: #666; text-align: center;">
-                            Sem capa
-                        </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="{% url 'virtuallibrary:home' %}">Home</a></li>
+                    <li><a href="{% url 'virtuallibrary:profile' %}" class="active">Meu Perfil</a></li>
+                    <li><a href="{% url 'virtuallibrary:book_list' %}">Descubra</a></li>
+                    
+                    <!-- Botão apenas para bibliotecários -->
+                    {% if user.groups.all %}
+                        {% for group in user.groups.all %}
+                            {% if group.name == 'Bibliotecário' %}
+                                <li><a href="{% url 'virtuallibrary:gerenciar_acervo' %}">Gerenciar Acervo</a></li>
+                            {% endif %}
+                        {% endfor %}
                     {% endif %}
                     
-                    <h3>
-                        <a href="{% url 'virtuallibrary:book_detail' emprestimo.book.id %}" style="text-decoration: none; color: #007bff;">
-                            {{ emprestimo.book.title }}
-                        </a>
-                    </h3>
-                    <p><strong>Autor:</strong> {{ emprestimo.book.author }}</p>
-                    <p><strong>Emprestado em:</strong> {{ emprestimo.data_emprestimo|date:"d/m/Y" }}</p>
-                    <p><strong>Data de devolução:</strong> {{ emprestimo.data_devolucao|date:"d/m/Y" }}</p>
-                    
-                    <!-- BOTÃO DE DEVOLUÇÃO -->
-                    <a href="{% url 'virtuallibrary:devolver_livro' emprestimo.id %}" 
-                        style="background-color: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; margin-top: 10px; display: inline-block;">
-                            📤 Devolver Livro
-                    </a>
+                    <li><a href="#club">Clube do livro</a></li>
+                    <li><a href="#collections">Coleções</a></li>
+                    <li><a href="#history">Histórico</a></li>
+                    <li><a href="#support">Suporte</a></li>
+                    <li><a href="#settings">Configurações</a></li>
+                </ul>
+            </nav>
 
-                    <div style="clear: both;"></div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>Você ainda não possui livros emprestados.</p>
-            <a href="{% url 'virtuallibrary:book_list' %}" 
-               style="background: #007bff; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px;">
-                Explorar Biblioteca
+            <a href="{% url 'virtuallibrary:logout' %}" class="logout">
+                🚪 Log out
             </a>
-        {% endif %}
-    </section>
-{% endblock %}
+        </aside>
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca Digital</title>
-    <link rel="stylesheet" href="/virtuallibrary/static/css/home.css">
-</head>
-<body>
-    <aside class="sidebar">
-        <div class="logo-container">
-            <img src="media/logo.png" alt="Logo" class="logo-img">
-            <div class="welcome">Bem vindo,<br><strong>(Fulano)!</strong></div>
-        </div>
-
-        <nav>
-            <ul class="nav-menu">
-                <li><a href="#home" class="active">Home</a></li>
-                <li><a href="#books">Meus livros</a></li>
-                <li><a href="#discover">Descubra</a></li>
-                <li><a href="#club">Clube do livro</a></li>
-                <li><a href="#collections">Coleções</a></li>
-                <li><a href="#history">Histórico</a></li>
-                <li><a href="#support">Suporte</a></li>
-                <li><a href="#settings">Configurações</a></li>
-            </ul>
-        </nav>
-
-        <a href="#logout" class="logout">
-            🚪 Log out
-        </a>
-    </aside>
-
-    <main class="main-content">        
-        <section class="content-section fade-in">
-            <h2 class="section-title">Empréstimos</h2>
-            <div class="loans">
-                <div class="book-card">
-                    <h3>Código limpo</h3>
-                </div>
-                <div class="book-card">
-                    <h3>Python Fluent</h3>
-                </div>
-                <div class="book-card">
-                    <h3>Django 5 by Example</h3>
+        <main class="main-content">
+            <!-- Seção de Livros Recomendados -->
+            <div class="content-section">
+                <h2 class="section-title">Recomendados</h2>
+                <div class="books-container">
+                    <div class="book-card">
+                        <h3>Código limpo</h3>
+                    </div>
+                    <div class="book-card">
+                        <h3>Python Fluent</h3>
+                    </div>
+                    <div class="book-card">
+                        <h3>Django 5 by Example</h3>
+                    </div>
+                    <div class="book-card">
+                        <h3>JavaScript: The Good Parts</h3>
+                    </div>
                 </div>
             </div>
-            <!-- <button class="nav-arrow">❯</button> -->
-        </section>
-
-        <section class="content-section fade-in">
-            <h2 class="section-title">Recomendados</h2>
-            <div class="categories">
-                <button class="category-btn active">Todos</button>
-                <button class="category-btn">Tecnologia</button>
-                <button class="category-btn">Computaria</button>
-                <button class="category-btn">Ciências</button>
-            </div>
-            <div class="books-grid">
-                <div class="book-card">
-                    <h3>Código limpo</h3>
+            
+            <!-- Seção de Empréstimos -->
+            <section class="content-section fade-in">
+                <h2 class="section-title">Empréstimos</h2>
+                <div class="loans">
+                    {% if emprestimos %}
+                        {% for emprestimo in emprestimos %}
+                            <div class="book-card" data-book-id="{{ emprestimo.book.id }}">
+                                {% if emprestimo.book.cover %}
+                                    <img src="{{ emprestimo.book.cover.url }}" alt="{{ emprestimo.book.title }}" class="book-cover">
+                                {% else %}
+                                    <div class="book-cover-placeholder">
+                                        Sem capa
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="book-info">
+                                    <h3>
+                                        <a href="{% url 'virtuallibrary:book_detail' emprestimo.book.id %}">
+                                            {{ emprestimo.book.title }}
+                                        </a>
+                                    </h3>
+                                    <p class="book-author">{{ emprestimo.book.author }}</p>
+                                    <p class="loan-date">Emprestado: {{ emprestimo.data_emprestimo|date:"d/m/Y" }}</p>
+                                    <p class="return-date">Devolução: {{ emprestimo.data_devolucao|date:"d/m/Y" }}</p>
+                                    
+                                    <a href="{% url 'virtuallibrary:devolver_livro' emprestimo.id %}" 
+                                    class="return-btn">
+                                        📤 Devolver Livro
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="book-card">
+                            <h3>Nenhum livro emprestado</h3>
+                            <p>Você ainda não possui livros emprestados.</p>
+                            <a href="{% url 'virtuallibrary:book_list' %}">Explorar Biblioteca</a>
+                        </div>
+                    {% endif %}
                 </div>
-                <div class="book-card">
-                    <h3>Código limpo</h3>
-                </div>
-                <div class="book-card">
-                    <h3>Código limpo</h3>
-                </div>
-                <div class="book-card">
-                    <h3>Código limpo</h3>
-                </div>
-            </div>
-             <button class="nav-arrow">❯</button>
-        </section>
-    </main>
+            </section>
 
-    <aside class="right-sidebar">
-        <div class="sidebar-section">
-            <h3>Fila de espera</h3>
-            <div class="item">
-                <h4>Nome livro</h4>
-                <p>Disponibilidade</p>
-            </div>
-            <div class="item">
-                <h4>Nome livro</h4>
-                <p>Disponibilidade</p>
-            </div>
-            <div class="item">
-                <h4>Nome livro</h4>
-                <p>Disponibilidade</p>
-            </div>
-        </div>
+        </main>
 
-        <div class="sidebar-section">
-            <h3>Datas de entrega</h3>
-            <div class="item">
-                <h4>Nome livro</h4>
-                <p>Data entrega</p>
+        <aside class="right-sidebar">
+            <!-- Fila de espera -->
+            <div class="sidebar-section">
+                <h3>Fila de espera</h3>
+                <div class="item">
+                    <h4>Em breve...</h4>
+                    <p>Funcionalidade em desenvolvimento</p>
+                </div>
             </div>
-            <div class="item">
-                <h4>Nome livro</h4>
-                <p>Data entrega</p>
-            </div>
-            <div class="item">
-                <h4>Nome livro</h4>
-                <p>Data entrega</p>
-            </div>
-        </div>
 
-        <div class="sidebar-section">
-            <h3>Coleções de professores</h3>
-            <div class="professor-item">
-                <div class="professor-avatar"></div>
-                <div class="professor-name">Nome</div>
+            <!-- Datas de entrega -->
+            <div class="sidebar-section">
+                <h3>Datas de entrega</h3>
+                {% if emprestimos %}
+                    {% for emprestimo in emprestimos %}
+                        <div class="item">
+                            <h4>{{ emprestimo.book.title }}</h4>
+                            <p>{{ emprestimo.data_devolucao|date:"d/m/Y" }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="item">
+                        <h4>Nenhuma entrega pendente</h4>
+                        <p>Sem empréstimos ativos</p>
+                    </div>
+                {% endif %}
             </div>
-            <div class="professor-item">
-                <div class="professor-avatar"></div>
-                <div class="professor-name">Nome</div>
+
+            <!-- Coleções de professores -->
+            <div class="sidebar-section">
+                <h3>Coleções de professores</h3>
+                <div class="professor-item">
+                    <div class="professor-avatar"></div>
+                    <div class="professor-name">Professor A</div>
+                </div>
+                <div class="professor-item">
+                    <div class="professor-avatar"></div>
+                    <div class="professor-name">Professor B</div>
+                </div>
+                <div class="professor-item">
+                    <div class="professor-avatar"></div>
+                    <div class="professor-name">Professor C</div>
+                </div>
+                <div class="professor-item">
+                    <div class="professor-avatar"></div>
+                    <div class="professor-name">Professor D</div>
+                </div>
             </div>
-            <div class="professor-item">
-                <div class="professor-avatar"></div>
-                <div class="professor-name">Nome</div>
-            </div>
-            <div class="professor-item">
-                <div class="professor-avatar"></div>
-                <div class="professor-name">Nome</div>
-            </div>
-        </div>
-    </aside>
-</body>
+        </aside>
+    </body>
 </html>

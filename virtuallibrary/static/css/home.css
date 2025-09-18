@@ -38,14 +38,19 @@ body {
   z-index: 1;
 }
 
-.logo-img {
-  width: 150px;
-  height: 150px;
-  object-fit: contain;
+i {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 48px;
 }
-
 .welcome {
-  font-size: 18px;
+  width: 100%;
+  font-size: 32px;
   font-weight: 600;
 }
 
@@ -64,7 +69,6 @@ body {
   text-decoration: none;
   display: flex;
   align-items: center;
-  padding: 14px 16px;
   border-radius: 10px;
   transition: all 0.3s ease;
   position: relative;
@@ -91,7 +95,7 @@ body {
   mask-repeat: no-repeat;
   mask-position: center;
 }
-
+/* 
 .nav-menu a[href="#home"]::before {
   mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>');
 }
@@ -104,7 +108,7 @@ body {
 .nav-menu a[href="#club"]::before {
   mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A2.996 2.996 0 0 0 17.06 7H16c-.8 0-1.54.37-2.01.95l-2.28 2.6c-.8.91-.8 2.29 0 3.2l1.48 1.69L12 17.5V22h4v-6l1.5 1.5c.4.4 1.04.39 1.44-.01L20.5 16H20v6h4z"/></svg>');
 }
-
+*/
 .logout {
   position: absolute;
   bottom: 25px;
@@ -136,6 +140,7 @@ body {
 /* SEÇÕES PRINCIPAIS */
 .content-section {
   background: #eaeaea;
+  flex-shrink: 0;
   border-radius: 25px;
   padding: 25px;
   margin: 25px 0px 25px 0px;
@@ -167,11 +172,10 @@ body {
 
 /* CARDS LIVROS */
 .book-card {
-  min-width: 200px;
+  width: 280px;
   background: #d9d9d9;
   border-radius: 15px;
   padding: 20px;
-  position: relative;
   cursor: pointer;
   transition: all 0.3s ease;
   overflow: hidden;
@@ -183,10 +187,15 @@ body {
 }
 
 .book-card h3 {
-  margin-top: 128px;
+  margin-top: 15px;
   font-size: 18px;
   font-weight: 600;
   color: #333;
+}
+
+.book-card img {
+    width: 30%;
+    display: block;
 }
 
 .categories {
