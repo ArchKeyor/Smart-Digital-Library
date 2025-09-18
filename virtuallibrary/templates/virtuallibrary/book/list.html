@@ -1,115 +1,124 @@
 {% load static %}
 <html>
-    <header class="main-header">
-        <h2>VIRTUAL LIBRARY</h2>
+    <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Meu Perfil - Virtual Library</title>
-        <link rel="stylesheet" href="{% static 'css/discovery.css' %}">
+        <link rel="stylesheet" href="{% static 'css/list.css' %}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    </header>
-    <body>
+    </head>
 
-        
-
-        <!-- Formulário de busca -->
-        <div class="search-container">
-            <form method="get" action="{% url 'virtuallibrary:book_list' %}" class="search-form">
-                {{ search_form.query }}
-                <button type="submit" class="search-btn">Buscar</button>
-            </form>
-        </div>
-
-        <!-- Indicador do filtro ativo -->
-        <div class="active-filter">
-            {% if tag %}
-                <h2>📚 Livros da categoria "{{ tag.name }}"</h2>
-            {% else %}
-                <h2>📚 Todos os livros</h2>
-            {% endif %}
-        </div>
-
-        <!-- Barra de categorias/filtros -->
+    <header class="main-header">
         <nav class="category-bar">
-            <div class="category-buttons">
-                <!-- Botão "Todos" -->
-                <a href="{% url 'virtuallibrary:book_list' %}" 
-                class="category-btn {% if not tag %}active{% endif %}">
-                    Todos
-                </a>
-                
-                <!-- Botões para cada tag -->
-                {% for filter_tag in all_tags %}
-                    <a href="{% url 'virtuallibrary:book_list_by_tag' filter_tag.slug %}"
-                    class="category-btn {% if tag.slug == filter_tag.slug %}active{% endif %}">
-                        {{ filter_tag.name }}
+            <div class="category-content">
+                <div class="category-buttons">
+                    <!-- Botão "Todos" -->
+                    <a href="{% url 'virtuallibrary:book_list' %}" 
+                    class="category-btn {% if not tag %}active{% endif %}">
+                        Todos
                     </a>
-                {% endfor %}
+                    
+                    <!-- Botões para cada tag -->
+                    {% for filter_tag in all_tags %}
+                        <a href="{% url 'virtuallibrary:book_list_by_tag' filter_tag.slug %}"
+                        class="category-btn {% if tag.slug == filter_tag.slug %}active{% endif %}">
+                            {{ filter_tag.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+                
+                <!-- Formulário de busca -->
+                <div class="search-container">
+                    <form method="get" action="{% url 'virtuallibrary:book_list' %}" class="search-form">
+                        {{ search_form.query }}
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
             </div>      
         </nav>
+    </header>
+    
+    <body>
+        <div class="main-container">
+            <!-- Indicador do filtro ativo -->
+            <div class="active-filter">
+                {% if tag %}
+                    <h2>📚 Livros da categoria "{{ tag.name }}"</h2>
+                {% else %}
+                    <h2>📚 Todos os livros</h2>
+                {% endif %}
+            </div>
+            
+            <!-- Container principal dos livros -->
+            <main class="library-container">
+                {% for book in books %}
+                    <article class="book-card">
+                        {% if book.cover %}
+                            <img src="{{ book.cover.url }}" alt="{{ book.title }}">
+                        {% else %}
+                            <div class="book-cover-placeholder">
+                                <i class="fas fa-book"></i>
+                                <span>Sem capa</span>
+                            </div>
+                        {% endif %}
 
-        <!-- Container principal dos livros -->
-        <main class="library-container">
-            {% for book in books %}
-                <article class="book-card">
-                    {% if book.cover %}
-                        <img src="{{ book.cover.url }}" alt="{{ book.title }}">
-                    {% else %}
-                        <div class="book-cover-placeholder">
-                            <i class="fas fa-book"></i>
-                            <span>Sem capa</span>
+                        <div class="card-content">
+                            <h3 class="book-title">
+                                <a href="{% url 'virtuallibrary:book_detail' book.id %}">
+                                    {{ book.title }}
+                                </a>
+                            </h3>
+
+                            <p class="book-author">
+                                <strong>Autor:</strong> {{ book.author }}
+                            </p>
+
+                            <p class="book-publication">
+                                <strong>Publicado em:</strong> {{ book.publication_date|date:"d/m/Y" }}
+                            </p>
+
+                            <div class="book-tags">
+                                <strong>Tags:</strong>
+                                {% for book_tag in book.tags.all %}
+                                    <a href="{% url 'virtuallibrary:book_list_by_tag' book_tag.slug %}" class="tag-link">
+                                        {{ book_tag.name }}
+                                    </a>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <p class="description">
+                                {{ book.body|truncatewords:30|striptags }}
+                            </p>
+
+                            <div class="book-actions">
+                                <a href="{% url 'virtuallibrary:book_detail' book.id %}" class="view-details-btn">
+                                    Ver Detalhes
+                                </a>
+                            </div>
                         </div>
-                    {% endif %}
-
-                    <div class="card-content">
-                        <h3 class="book-title">
-                            <a href="{% url 'virtuallibrary:book_detail' book.id %}">
-                                {{ book.title }}
-                            </a>
-                        </h3>
-
-                        <p class="book-author">
-                            <strong>Autor:</strong> {{ book.author }}
-                        </p>
-
-                        <p class="book-publication">
-                            <strong>Publicado em:</strong> {{ book.publication_date|date:"d/m/Y" }}
-                        </p>
-
-                        <div class="book-tags">
-                            <strong>Tags:</strong>
-                            {% for book_tag in book.tags.all %}
-                                <a href="{% url 'virtuallibrary:book_list_by_tag' book_tag.slug %}" class="tag-link">
-                                    {{ book_tag.name }}
-                                </a>{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        </div>
-
-                        <p class="description">
-                            {{ book.body|truncatewords:30|striptags }}
-                        </p>
-
-                        <div class="book-actions">
-                            <a href="{% url 'virtuallibrary:book_detail' book.id %}" class="view-details-btn">
-                                Ver Detalhes
+                    </article>
+                {% empty %}
+                    <div class="no-books-message">
+                        <div class="no-books-content">
+                            <i class="fas fa-book-open"></i>
+                            <h3>Nenhum livro encontrado</h3>
+                            <p>Não há livros disponíveis para os filtros selecionados.</p>
+                            <a href="{% url 'virtuallibrary:book_list' %}" class="back-to-all-btn">
+                                Ver todos os livros
                             </a>
                         </div>
                     </div>
-                </article>
-            {% empty %}
-                <div class="no-books-message">
-                    <h3>Nenhum livro encontrado</h3>
-                    <p>Não há livros disponíveis para os filtros selecionados.</p>
-                    <a href="{% url 'virtuallibrary:book_list' %}" class="back-to-all-btn">
-                        Ver todos os livros
-                    </a>
-                </div>
-            {% endfor %}
-        </main>
+                {% endfor %}
+            </main>
+        </div>
 
         <!-- Paginação -->
-        <div class="pagination-container">
-            {% include "pagination.html" with page=books %}
-        </div>
+        <footer class="pagination-footer">
+            <div class="pagination-container">
+                {% include "pagination.html" with page=books %}
+            </div>
+        </footer>
     </body>
 </html>
