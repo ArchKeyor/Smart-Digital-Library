@@ -10,17 +10,15 @@ Smart Digital Library é uma plataforma web em Django que moderniza a gestão de
 - 📑 Criação de listas temáticas e coleções acuradas de leitura
 - 👤 Autenticação e perfis de usuários
 - 📊 Dashboard administrativo (admin Django)
-- 📱 Frontend responsivo com HTML, CSS e JavaScript
+- 📱 Frontend responsivo com HTML, CSS
 
 ---
 
 ## 🏗️ Arquitetura
-- **Backend**: Django + Django REST Framework (para APIs)
-- **Frontend**: Templates Django + JS + HTML + CSS
+- **Backend**: Django
+- **Frontend**: Templates Django + HTML + CSS
 - **Banco de Dados**: SQLite em dev
 - **IA**: Algoritmos de recomendação
-
-![Arquitetura](docs/arquitetura.png)
 
 ---
 
@@ -28,9 +26,8 @@ Smart Digital Library é uma plataforma web em Django que moderniza a gestão de
 ```bash
 smart-digital-library/
 │── smart-digital-library/ # Configurações principais do projeto
-│── apps/                  # Módulos (catálogo, usuários, recomendação, listas)
+│── virtuallibrary/                  # Módulos (catálogo, usuários, recomendação, listas)
 │── static/                # Arquivos CSS, JS e imagens
 │── templates/             # Templates HTML globais
 │── media/                 # Uploads de usuários
-│── docs/                  # Documentação (diagramas, requisitos, etc.)
 │── manage.py
