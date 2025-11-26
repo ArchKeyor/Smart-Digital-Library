@@ -7,9 +7,12 @@ from django.db.models import Count, Q
 from .models import Book, Emprestimo, UserProfile
 from .forms import SearchForm
 from django.conf import settings
-from datetime import timezone, date
+from datetime import date
 from django.contrib import messages
 from django.utils.text import slugify
+from django.utils import timezone
+
+
 
 def book_list(request, tag_slug=None):
     book_list = Book.published.all()
@@ -102,9 +105,10 @@ def home_view(request):
 
     return render(request, 'home/home.html', {
         'user': request.user,
-        'emprestimos_ativos': emprestimos_ativos,
+        'emprestimos': emprestimos_ativos,
         'historico': historico,
     })
+
 
 def logout_view(request):
     logout(request)
@@ -112,22 +116,27 @@ def logout_view(request):
 
 @login_required
 def emprestar_livro(request, book_id):
-    # Limite de empréstimos ativos por usuário (3)
     limite = 3
-    ativo_count = Emprestimo.objects.filter(user=request.user, status=Emprestimo.Status.EMPRESTADO).count()
+    ativo_count = Emprestimo.objects.filter(
+        user=request.user,
+        status=Emprestimo.Status.EMPRESTADO
+    ).count()
+
     if ativo_count >= limite:
         messages.error(request, f"Você já tem {limite} livros emprestados. Devolva um livro primeiro.")
         return redirect('virtuallibrary:book_detail', id=book_id)
 
     book = get_object_or_404(Book, id=book_id, status=Book.Status.PUBLISHED)
 
-    # Verifica se o livro já está emprestado por outra pessoa (ou por você)
-    emprestimo_ativo = Emprestimo.objects.filter(book=book, status=Emprestimo.Status.EMPRESTADO).first()
+    emprestimo_ativo = Emprestimo.objects.filter(
+        book=book,
+        status=Emprestimo.Status.EMPRESTADO
+    ).first()
+
     if emprestimo_ativo:
         messages.error(request, "Este livro já está emprestado no momento.")
         return redirect('virtuallibrary:book_detail', id=book_id)
 
-    # Cria um novo registro de empréstimo (histórico preservado)
     Emprestimo.objects.create(
         user=request.user,
         book=book,
@@ -135,7 +144,8 @@ def emprestar_livro(request, book_id):
     )
 
     messages.success(request, f"Livro '{book.title}' emprestado com sucesso!")
-    return redirect('virtuallibrary:home')
+    return redirect('virtuallibrary:book_detail', id=book_id)
+
 
 def devolver_livro(request, emprestimo_id):
     emprestimo = get_object_or_404(Emprestimo, id=emprestimo_id, user=request.user)
@@ -314,7 +324,7 @@ def historico(request):
 
     emprestimos = emprestimos.order_by("-data_emprestimo")
 
-    paginator = Paginator(emprestimos, 8)  # 8 registros por página
+    paginator = Paginator(emprestimos, 4)  # 3 registros por página
     page = request.GET.get("page")
     emprestimos_page = paginator.get_page(page)
 
@@ -323,3 +333,12 @@ def historico(request):
         "filtro": filtro
     }
     return render(request, "virtuallibrary/historico.html", context)
+
+def devolver_livro(request, emprestimo_id):
+    emprestimo = get_object_or_404(Emprestimo, pk=emprestimo_id)
+
+    emprestimo.data_devolucao = timezone.now()
+    emprestimo.status = Emprestimo.Status.DEVOLVIDO
+    emprestimo.save()
+
+    return redirect('virtuallibrary:historico')
