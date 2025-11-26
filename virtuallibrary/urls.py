@@ -12,12 +12,14 @@ urlpatterns = [
  path('login/', views.login_view, name='login'),
  path('logout/', views.logout_view, name='logout'),
  path('profile/', views.profile, name='profile'),
+ path('historico/', views.historico, name='historico'),
  path('emprestar/<int:book_id>/', views.emprestar_livro, name='emprestar_livro'),
  path('devolver/<int:emprestimo_id>/', views.devolver_livro, name='devolver_livro'),
  path('gerenciar-acervo/', views.gerenciar_acervo, name='gerenciar_acervo'),
  path('adicionar-livro/', views.adicionar_livro, name='adicionar_livro'),
  path('editar-livro/<int:book_id>/', views.editar_livro, name='editar_livro'),
  path('deletar-livro/<int:book_id>/', views.deletar_livro, name='deletar_livro'),
+ 
 
 
 ]

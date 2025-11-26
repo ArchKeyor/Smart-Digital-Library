@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import Book, UserProfile
+from .models import Book, UserProfile, Emprestimo
 
 # Register your models here.
 
@@ -53,3 +53,8 @@ class UserProfileAdmin(admin.ModelAdmin):
         "data_nascimento" 
     )
     
+@admin.register(Emprestimo)
+class EmprestimoAdmin(admin.ModelAdmin):
+    list_display = ('book', 'user', 'status', 'data_emprestimo', 'data_devolucao')
+    list_filter = ('status',)
+    search_fields = ('book__title', 'user__username')

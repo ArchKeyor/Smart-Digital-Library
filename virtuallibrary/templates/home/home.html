@@ -20,6 +20,7 @@
                     <li><a href="{% url 'virtuallibrary:home' %}">Home</a></li>
                     <li><a href="{% url 'virtuallibrary:profile' %}" class="active">Meu Perfil</a></li>
                     <li><a href="{% url 'virtuallibrary:book_list' %}">Descubra</a></li>
+                    <li><a href="{% url 'virtuallibrary:historico' %}">Histórico</a></li>
                     
                     <!-- Botão apenas para bibliotecários -->
                     {% if user.groups.all %}
