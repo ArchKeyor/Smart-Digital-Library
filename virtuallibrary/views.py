@@ -161,15 +161,31 @@ def devolver_livro(request, emprestimo_id):
     messages.success(request, f"Livro '{emprestimo.book.title}' devolvido com sucesso!")
     return redirect('virtuallibrary:home')
 
-@login_required
 def profile(request):
-    # Pega ou cria o perfil do usuário
     profile, created = UserProfile.objects.get_or_create(user=request.user)
 
-    # Pega os empréstimos do usuário (ativos e histórico)
-    emprestimos_ativos = Emprestimo.objects.filter(user=request.user, status=Emprestimo.Status.EMPRESTADO).select_related('book')
-    historico = Emprestimo.objects.filter(user=request.user).select_related('book').order_by('-data_emprestimo')
+    # Empréstimos ativos
+    emprestimos_ativos = Emprestimo.objects.filter(
+        user=request.user,
+        status=Emprestimo.Status.EMPRESTADO
+    ).select_related('book')
 
+    # Empréstimos devolvidos
+    emprestimos_devolvidos = Emprestimo.objects.filter(
+        user=request.user,
+        status=Emprestimo.Status.DEVOLVIDO
+    )
+
+    # Histórico completo
+    historico = Emprestimo.objects.filter(
+        user=request.user
+    ).select_related('book').order_by('-data_emprestimo')
+
+    # Estatísticas numéricas
+    total_emprestados = emprestimos_ativos.count()
+    total_devolvidos = emprestimos_devolvidos.count()
+
+    # Cálculo de prazo/atraso
     for e in emprestimos_ativos:
         e.prazo = e.prazo_devolucao(dias=14)
         e.atrasado = e.is_atrasado(dias=14)
@@ -177,7 +193,12 @@ def profile(request):
     context = {
         'profile': profile,
         'emprestimos_ativos': emprestimos_ativos,
+        'emprestimos_devolvidos': emprestimos_devolvidos,
         'historico': historico,
+
+        # Estatísticas
+        'total_emprestados': total_emprestados,
+        'total_devolvidos': total_devolvidos,
     }
 
     return render(request, 'virtuallibrary/profile.html', context)
