@@ -102,6 +102,7 @@ def home_view(request):
         for e in emprestimos_ativos:
             e.prazo = e.prazo_devolucao(dias=14)  # usa método do model
             e.atrasado = e.is_atrasado(dias=14)
+            e.data_devolucao = e.data_emprestimo + timezone.timedelta(days=15)  # <--- AQUI
 
     return render(request, 'home/home.html', {
         'user': request.user,

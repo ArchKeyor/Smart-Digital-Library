@@ -16,13 +16,24 @@
 
         <nav>
             <ul class="nav-menu">
+
+
                 <li><a href="{% url 'virtuallibrary:home' %}">Home</a></li>
                 <li><a href="{% url 'virtuallibrary:profile' %}">Meu Perfil</a></li>
                 <li><a href="{% url 'virtuallibrary:book_list' %}">Descubra</a></li>
                 <li><a href="{% url 'virtuallibrary:historico' %}" class="active">Histórico</a></li>
+
+                <!-- Botão apenas para bibliotecários -->
+                {% if user.groups.all %}
+                    {% for group in user.groups.all %}
+                        {% if group.name == 'Bibliotecário' %}
+                                <li><a href="{% url 'virtuallibrary:gerenciar_acervo' %}">Gerenciar Acervo</a></li>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                
                 <li><a href="#club">Clube do livro</a></li>
                 <li><a href="#collections">Coleções</a></li>
-                <li><a href="#history">Histórico</a></li>
                 <li><a href="#support">Suporte</a></li>
                 <li><a href="#settings">Configurações</a></li>
             </ul>
