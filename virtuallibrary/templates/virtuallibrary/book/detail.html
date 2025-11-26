@@ -1,64 +1,91 @@
 {% load static %}
 
+
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/detail.css' %}">
+<title>Book page</title>
+<div class="container">
+    <!-- Mensagens de erro/sucesso -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                <div class="error-message">{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 
-<!-- Mensagens de erro/sucesso -->
-{% if messages %}
-    {% for message in messages %}
-        {% if message.tags == 'error' %}
-            <p style="color: red;">{{ message }}</p>
-        {% endif %}
-    {% endfor %}
-{% endif %}
-
-<h1>{{ book.title }}</h1>
-
-{% if book.cover %}
-    <img src="{{ book.cover.url }}" alt="{{ book.title }}" width="80" height="120" style="border-radius: 3px;">
-{% else %}
-    <div style="width: 80px; height: 120px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 12px; color: #666; text-align: center;">
-        Sem capa
-    </div>
-{% endif %}
-
-<p><strong>Autor:</strong> {{ book.author }}</p>
-<p><strong>Publicado em:</strong> {{ book.publication_date|date:"d/m/Y" }}</p>
-
-<p class="tags">
-    <strong>Tags:</strong> 
-    {% for tag in book.tags.all %}
-        <a href="{% url 'virtuallibrary:book_list_by_tag' tag.slug %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
-    {% endfor %}
-</p>
-
-<div>{{ book.body|linebreaks }}</div>
-
-{% if user.is_authenticated %}
-    <div style="margin: 20px 0;">
-        <a href="{% url 'virtuallibrary:emprestar_livro' book.id %}" 
-           style="background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-            📚 Emprestar este livro
-        </a>
-    </div>
-{% endif %}
-
-<h2>Livros similares</h2>
-{% for similar_book in similar_books %}
-    <div style="display: inline-block; margin: 10px; text-align: left; width: 150px;">
-        <a href="{{ similar_book.get_absolute_url }}">
-            {% if similar_book.cover %}
-                <img src="{{ similar_book.cover.url }}" alt="{{ similar_book.title }}" width="120" height="180">
+    <!-- Header do Livro -->
+    <div class="book-header">
+        <div class="book-cover">
+            {% if book.cover %}
+                <img src="{{ book.cover.url }}" alt="{{ book.title }}">
             {% else %}
-                <div style="width: 120px; height: 180px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 12px; color: #666; text-align: center;">
+                <div class="no-cover">
                     Sem capa
                 </div>
             {% endif %}
-            <div style="margin-top: 5px; font-size: 14px; font-weight: bold; color: #333;">
-                {{ similar_book.title }}
+        </div>
+        
+        <div class="book-info">
+            <h1 class="book-title">{{ book.title }}</h1>
+            
+            <div class="book-meta">
+                <p><strong>Autor:</strong> {{ book.author }}</p>
+                <p><strong>Publicado em:</strong> {{ book.publication_date|date:"d/m/Y" }}</p>
             </div>
-        </a>
+            
+            <div class="tags">
+                <strong>Tags:</strong> 
+                {% for tag in book.tags.all %}
+                    <a href="{% url 'virtuallibrary:book_list_by_tag' tag.slug %}">{{ tag.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-{% empty %}
-    <p>Não há livros similares.</p>
-{% endfor %}
+
+    <!-- Descrição do Livro -->
+    <div class="book-description">
+        {{ book.body|linebreaks }}
+    </div>
+
+    <!-- Seção de Empréstimo -->
+    {% if user.is_authenticated %}
+        <div class="borrow-section">
+            <a href="{% url 'virtuallibrary:emprestar_livro' book.id %}" class="borrow-btn">
+                Pegar emprestado
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Livros Similares -->
+    <div class="similar-books-section">
+        <h2 class="similar-books-title">Livros similares</h2>
+        
+        {% if similar_books %}
+            <div class="similar-books-grid">
+                {% for similar_book in similar_books %}
+                    <div class="similar-book-item">
+                        <a href="{{ similar_book.get_absolute_url }}">
+                            {% if similar_book.cover %}
+                                <img src="{{ similar_book.cover.url }}" alt="{{ similar_book.title }}">
+                            {% else %}
+                                <div class="no-cover">
+                                    Sem capa
+                                </div>
+                            {% endif %}
+                            <div class="similar-book-title">
+                                {{ similar_book.title }}
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-similar-books">
+                <p>Não há livros similares disponíveis no momento.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
 {% endblock %}
