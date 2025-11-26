@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.urls import reverse
 from taggit.managers import TaggableManager
 from django.contrib.auth.models import User
+from datetime import timedelta
 
 
 class PublishedManager(models.Manager):
@@ -79,14 +80,51 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.tipo_perfil}"
 
+from django.utils import timezone
+
 class Emprestimo(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    class Status(models.TextChoices):
+        EMPRESTADO = 'EM', 'Emprestado'
+        DEVOLVIDO = 'DV', 'Devolvido'
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='emprestimos'
+    )
+    book = models.ForeignKey(
+        Book,
+        on_delete=models.CASCADE,
+        related_name='emprestimos'
+    )
+
     data_emprestimo = models.DateTimeField(auto_now_add=True)
-    
+    data_devolucao = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(
+        max_length=2,
+        choices=Status.choices,
+        default=Status.EMPRESTADO
+    )
+    observacoes = models.TextField(null=True, blank=True)
+
     class Meta:
-        unique_together = ['user', 'book']
         ordering = ['-data_emprestimo']
-    
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['data_emprestimo']),
+        ]
+
     def __str__(self):
-        return f"{self.user.username} - {self.book.title}"
+        return f"{self.book.title} - {self.user.username} ({self.get_status_display()})"
+
+    @property
+    def esta_ativo(self):
+        return self.status == self.Status.EMPRESTADO
+
+    def prazo_devolucao(self, dias=14):
+        return self.data_emprestimo + timedelta(days=dias)
+
+    def is_atrasado(self, dias=14):
+        if self.data_devolucao:
+            return False
+        return timezone.now() > self.prazo_devolucao(dias=dias)

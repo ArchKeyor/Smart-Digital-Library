@@ -7,9 +7,12 @@ from django.db.models import Count, Q
 from .models import Book, Emprestimo, UserProfile
 from .forms import SearchForm
 from django.conf import settings
-from datetime import timedelta, date
+from datetime import date
 from django.contrib import messages
 from django.utils.text import slugify
+from django.utils import timezone
+
+
 
 def book_list(request, tag_slug=None):
     book_list = Book.published.all()
@@ -85,58 +88,122 @@ def login_view(request):
 
 def home_view(request):
     emprestimos = []
+    emprestimos_ativos = []
+    historico = []
+
     if request.user.is_authenticated:
-        emprestimos = Emprestimo.objects.filter(user=request.user).select_related('book')
-        
-        # Adiciona a data de devolução para cada empréstimo
-        for emprestimo in emprestimos:
-            emprestimo.data_devolucao = emprestimo.data_emprestimo + timedelta(days=14)
-    
+        # Todos os empréstimos do usuário (histórico)
+        historico = Emprestimo.objects.filter(user=request.user).select_related('book').order_by('-data_emprestimo')
+
+        # Apenas os ativos (emprestados)
+        emprestimos_ativos = historico.filter(status=Emprestimo.Status.EMPRESTADO)
+
+        # calculos extras (prazo, atrasado)
+        for e in emprestimos_ativos:
+            e.prazo = e.prazo_devolucao(dias=14)  # usa método do model
+            e.atrasado = e.is_atrasado(dias=14)
+            e.data_devolucao = e.data_emprestimo + timezone.timedelta(days=15)  # <--- AQUI
+
     return render(request, 'home/home.html', {
         'user': request.user,
-        'emprestimos': emprestimos
+        'emprestimos': emprestimos_ativos,
+        'historico': historico,
     })
+
 
 def logout_view(request):
     logout(request)
     return redirect('/')
 
+@login_required
 def emprestar_livro(request, book_id):
-    if request.user.is_authenticated:
-        if Emprestimo.objects.filter(user=request.user).count() >= 3:
-            messages.error(request, "Você já tem 3 livros emprestados. Devolva um livro primeiro.")
-            return redirect('virtuallibrary:book_detail', id=book_id)
+    limite = 3
+    ativo_count = Emprestimo.objects.filter(
+        user=request.user,
+        status=Emprestimo.Status.EMPRESTADO
+    ).count()
 
-        book = get_object_or_404(Book, id=book_id)
-        emprestimo, created = Emprestimo.objects.get_or_create(
-            user=request.user, 
-            book=book
-        )
-        return redirect('virtuallibrary:home')
-    else:
-        return redirect('virtuallibrary:login')
-    
+    if ativo_count >= limite:
+        messages.error(request, f"Você já tem {limite} livros emprestados. Devolva um livro primeiro.")
+        return redirect('virtuallibrary:book_detail', id=book_id)
+
+    book = get_object_or_404(Book, id=book_id, status=Book.Status.PUBLISHED)
+
+    emprestimo_ativo = Emprestimo.objects.filter(
+        book=book,
+        status=Emprestimo.Status.EMPRESTADO
+    ).first()
+
+    if emprestimo_ativo:
+        messages.error(request, "Este livro já está emprestado no momento.")
+        return redirect('virtuallibrary:book_detail', id=book_id)
+
+    Emprestimo.objects.create(
+        user=request.user,
+        book=book,
+        status=Emprestimo.Status.EMPRESTADO
+    )
+
+    messages.success(request, f"Livro '{book.title}' emprestado com sucesso!")
+    return redirect('virtuallibrary:book_detail', id=book_id)
+
+
 def devolver_livro(request, emprestimo_id):
-    if request.user.is_authenticated:
-        emprestimo = get_object_or_404(Emprestimo, id=emprestimo_id, user=request.user)
-        emprestimo.delete()
-        messages.success(request, f"Livro '{emprestimo.book.title}' devolvido com sucesso!")
+    emprestimo = get_object_or_404(Emprestimo, id=emprestimo_id, user=request.user)
+
+    if emprestimo.status == Emprestimo.Status.DEVOLVIDO:
+        messages.warning(request, "Este empréstimo já foi devolvido.")
+        return redirect('virtuallibrary:home')
+
+    emprestimo.status = Emprestimo.Status.DEVOLVIDO
+    emprestimo.data_devolucao = timezone.now()
+    emprestimo.save()
+
+    messages.success(request, f"Livro '{emprestimo.book.title}' devolvido com sucesso!")
     return redirect('virtuallibrary:home')
 
-@login_required
 def profile(request):
-    # Pega ou cria o perfil do usuário
     profile, created = UserProfile.objects.get_or_create(user=request.user)
-    
-    # Pega os empréstimos do usuário
-    emprestimos = Emprestimo.objects.filter(user=request.user).select_related('book')
-    
+
+    # Empréstimos ativos
+    emprestimos_ativos = Emprestimo.objects.filter(
+        user=request.user,
+        status=Emprestimo.Status.EMPRESTADO
+    ).select_related('book')
+
+    # Empréstimos devolvidos
+    emprestimos_devolvidos = Emprestimo.objects.filter(
+        user=request.user,
+        status=Emprestimo.Status.DEVOLVIDO
+    )
+
+    # Histórico completo
+    historico = Emprestimo.objects.filter(
+        user=request.user
+    ).select_related('book').order_by('-data_emprestimo')
+
+    # Estatísticas numéricas
+    total_emprestados = emprestimos_ativos.count()
+    total_devolvidos = emprestimos_devolvidos.count()
+
+    # Cálculo de prazo/atraso
+    for e in emprestimos_ativos:
+        e.prazo = e.prazo_devolucao(dias=14)
+        e.atrasado = e.is_atrasado(dias=14)
+
     context = {
         'profile': profile,
-        'emprestimos': emprestimos,
+        'emprestimos_ativos': emprestimos_ativos,
+        'emprestimos_devolvidos': emprestimos_devolvidos,
+        'historico': historico,
+
+        # Estatísticas
+        'total_emprestados': total_emprestados,
+        'total_devolvidos': total_devolvidos,
     }
-    
+
     return render(request, 'virtuallibrary/profile.html', context)
+
 # Funções de verificação de grupos
 def is_bibliotecario(user):
     return user.is_authenticated and user.groups.filter(name='Bibliotecário').exists()
@@ -265,3 +332,35 @@ def deletar_livro(request, book_id):
     book.delete()
     messages.success(request, f"Livro '{title}' removido com sucesso!")
     return redirect('virtuallibrary:gerenciar_acervo')
+
+@login_required
+def historico(request):
+    filtro = request.GET.get("f", "todos")  # todos | ativos | devolvidos
+    
+    emprestimos = Emprestimo.objects.filter(user=request.user)
+
+    if filtro == "ativos":
+        emprestimos = emprestimos.filter(status=Emprestimo.Status.EMPRESTADO)
+    elif filtro == "devolvidos":
+        emprestimos = emprestimos.filter(status=Emprestimo.Status.DEVOLVIDO)
+
+    emprestimos = emprestimos.order_by("-data_emprestimo")
+
+    paginator = Paginator(emprestimos, 4)  # 3 registros por página
+    page = request.GET.get("page")
+    emprestimos_page = paginator.get_page(page)
+
+    context = {
+        "emprestimos": emprestimos_page,
+        "filtro": filtro
+    }
+    return render(request, "virtuallibrary/historico.html", context)
+
+def devolver_livro(request, emprestimo_id):
+    emprestimo = get_object_or_404(Emprestimo, pk=emprestimo_id)
+
+    emprestimo.data_devolucao = timezone.now()
+    emprestimo.status = Emprestimo.Status.DEVOLVIDO
+    emprestimo.save()
+
+    return redirect('virtuallibrary:historico')

@@ -1,0 +1,123 @@
+{% load static %}
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico de Empréstimos - Virtual Library</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="logo-container">
+            <i class="fas fa-book"></i>
+            <div class="welcome">Histórico<br><strong>{{ user.username }}</strong></div>
+        </div>
+
+        <nav>
+            <ul class="nav-menu">
+
+
+                <li><a href="{% url 'virtuallibrary:home' %}">Home</a></li>
+                <li><a href="{% url 'virtuallibrary:profile' %}">Meu Perfil</a></li>
+                <li><a href="{% url 'virtuallibrary:book_list' %}">Descubra</a></li>
+                <li><a href="{% url 'virtuallibrary:historico' %}" class="active">Histórico</a></li>
+
+                <!-- Botão apenas para bibliotecários -->
+                {% if user.groups.all %}
+                    {% for group in user.groups.all %}
+                        {% if group.name == 'Bibliotecário' %}
+                                <li><a href="{% url 'virtuallibrary:gerenciar_acervo' %}">Gerenciar Acervo</a></li>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                
+                <li><a href="#club">Clube do livro</a></li>
+                <li><a href="#collections">Coleções</a></li>
+                <li><a href="#support">Suporte</a></li>
+                <li><a href="#settings">Configurações</a></li>
+            </ul>
+        </nav>
+
+        <a href="{% url 'virtuallibrary:logout' %}" class="logout">🚪 Log out</a>
+    </aside>
+
+    <main class="main-content fade-in">
+
+        <h2 class="section-title">Histórico de Empréstimos</h2>
+
+        <!-- Filtros -->
+        <div class="filters">
+            <a href="?f=todos" class="filter-btn {% if filtro == 'todos' %}active{% endif %}">
+                Todos
+            </a>
+            <a href="?f=ativos" class="filter-btn {% if filtro == 'ativos' %}active{% endif %}">
+                Ativos
+            </a>
+            <a href="?f=devolvidos" class="filter-btn {% if filtro == 'devolvidos' %}active{% endif %}">
+                Devolvidos
+            </a>
+        </div>
+
+        <div class="books-container">
+            {% if emprestimos %}
+                {% for emprestimo in emprestimos %}
+                    <div class="book-card">
+                        {% if emprestimo.book.cover %}
+                            <img src="{{ emprestimo.book.cover.url }}" alt="{{ emprestimo.book.title }}" class="book-cover">
+                        {% else %}
+                            <div class="book-cover-placeholder">Sem capa</div>
+                        {% endif %}
+
+                        <div class="book-info">
+                            <h3><a href="{% url 'virtuallibrary:book_detail' emprestimo.book.id %}">
+                                {{ emprestimo.book.title }}
+                            </a></h3>
+
+                            <p class="book-author">{{ emprestimo.book.author }}</p>
+
+                            <p>
+                                <strong>Emprestado:</strong> 
+                                {{ emprestimo.data_emprestimo|date:"d/m/Y H:i" }}
+                            </p>
+
+                            {% if emprestimo.status == "EM" %}
+                                <p class="status active">📘 Ativo</p>
+                                <p><strong>Devolução prevista:</strong> - </p>
+                                
+                                <a class="return-btn" 
+                                   href="{% url 'virtuallibrary:devolver_livro' emprestimo.id %}">
+                                   📤 Devolver
+                                </a>
+
+                            {% else %}
+                                <p class="status returned">📗 Devolvido</p>
+                                <p>
+                                    <strong>Devolvido em:</strong>
+                                    {{ emprestimo.data_devolucao|date:"d/m/Y H:i" }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="opacity: 0.7;">Nenhum registro encontrado.</p>
+            {% endif %}
+        </div>
+
+        <!-- Paginação -->
+        <div class="pagination">
+            {% if emprestimos.has_previous %}
+                <a href="?page={{ emprestimos.previous_page_number }}&f={{ filtro }}">« Anterior</a>
+            {% endif %}
+
+            <span>Página {{ emprestimos.number }} de {{ emprestimos.paginator.num_pages }}</span>
+
+            {% if emprestimos.has_next %}
+                <a href="?page={{ emprestimos.next_page_number }}&f={{ filtro }}">Próxima »</a>
+            {% endif %}
+        </div>
+
+    </main>
+</body>
+</html>
