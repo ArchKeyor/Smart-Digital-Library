@@ -51,9 +51,13 @@
     <!-- Seção de Empréstimo -->
     {% if user.is_authenticated %}
         <div class="borrow-section">
-            <a href="{% url 'virtuallibrary:emprestar_livro' book.id %}" class="borrow-btn">
+            <button id="btn-emprestar" 
+                    class="borrow-btn" 
+                    style="cursor: pointer; border: none; font-size: 16px;"
+                    data-book-id="{{ book.id }}" 
+                    data-username="{{ user.username }}">
                 Pegar emprestado
-            </a>
+            </button>
         </div>
     {% endif %}
 
@@ -87,5 +91,79 @@
         {% endif %}
     </div>
 </div>
+<script>
+    document.getElementById('btn-emprestar').addEventListener('click', async function() {
+        const btn = this;
+        const bookId = btn.getAttribute('data-book-id');
+        const username = btn.getAttribute('data-username');
 
+        // Como sua API exige CPF, vamos pedir ao usuário (ou pegar do perfil se tiver)
+        const cpf = prompt("Por favor, confirme seu CPF para finalizar o empréstimo (formato: 000.000.000-00):");
+        
+        if (!cpf) return; // Se cancelar, para tudo.
+
+        // Calcular data de devolução (Data de hoje + 7 dias)
+        const hoje = new Date();
+        const dataDevolucao = new Date(hoje);
+        dataDevolucao.setDate(hoje.getDate() + 7); 
+        // Formata para YYYY-MM-DD
+        const dataFormatada = dataDevolucao.toISOString().split('T')[0];
+
+        // Prepara os dados para a API
+        const dados = {
+            livro: parseInt(bookId),
+            nome_aluno: username,
+            cpf_aluno: cpf,
+            data_devolucao: dataFormatada
+        };
+
+        try {
+            btn.disabled = true; // Evita clique duplo
+            btn.textContent = "Processando...";
+
+            const response = await fetch('http://127.0.0.1:8000/api/emprestimos/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // Importante para segurança no Django
+                },
+                body: JSON.stringify(dados)
+            });
+
+            if (response.ok) {
+                alert("Livro emprestado com sucesso!");
+                // Redireciona para a Home para ver o livro lá
+                window.location.href = "{% url 'virtuallibrary:home' %}";
+            } else {
+                const erro = await response.json();
+                // Mostra o erro que veio da API (ex: "Sem estoque")
+                alert("Erro ao emprestar: " + JSON.stringify(erro));
+                btn.disabled = false;
+                btn.textContent = "Pegar emprestado";
+            }
+
+        } catch (error) {
+            console.error('Erro:', error);
+            alert("Erro de conexão com a API.");
+            btn.disabled = false;
+            btn.textContent = "Pegar emprestado";
+        }
+    });
+
+    // Função auxiliar para pegar o Token CSRF do Django
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 {% endblock %}

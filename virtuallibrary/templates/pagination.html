@@ -1,3 +1,27 @@
+<div class="books-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+    
+    {% for book in page %}
+        <div class="book-card" style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center;">
+            <a href="{{ book.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+                
+                {% if book.cover %}
+                    <img src="{{ book.cover.url }}" alt="{{ book.title }}" style="max-width: 100%; height: auto; max-height: 250px;">
+                {% else %}
+                    <div style="width: 100%; height: 200px; background-color: #eee; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                        <span style="color: #666;">Sem Capa</span>
+                    </div>
+                {% endif %}
+                
+                <h3 style="margin: 10px 0 5px 0; font-size: 1.1em;">{{ book.title }}</h3>
+                <p style="color: #666; font-size: 0.9em;">{{ book.author }}</p>
+            </a>
+        </div>
+    {% empty %}
+        <p>Nenhum livro encontrado na página {{ page.number }}.</p>
+    {% endfor %}
+
+</div>
+
 <div class="pagination">
 <span class="step-links">
  {% if page.has_previous %}

@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'taggit',
     'virtuallibrary.apps.VirtuallibraryConfig',
-    
-    
+    'rest_framework',
+    'rest_framework.authtoken',
+    'core',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -125,7 +127,8 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/virtuallibrary/home/'   # substitua pela página inicial após login
+# substitua pela página inicial após login
+LOGIN_REDIRECT_URL = '/virtuallibrary/home/'
 LOGOUT_REDIRECT_URL = '/'       # volta para a tela de login após logout
 
 STATIC_URL = '/static/'
@@ -137,3 +140,13 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # Autenticação por Token (API Key)
+        'rest_framework.authentication.TokenAuthentication',
+        # Autenticação por Sessão (Admin)
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
